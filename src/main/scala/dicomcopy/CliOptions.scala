@@ -2,12 +2,13 @@ package dicomcopy
 
 import org.apache.commons.cli.{HelpFormatter, Option, Options}
 
+
 object CliOptions {
 
   // Define command line options
   val options: Options = new Options
 
-  //Add help option
+  // Add help option
   private val helpOpt: Option = Option.builder("h")
     .longOpt("help")
     .desc("print help")

@@ -1,8 +1,10 @@
 package dicomcopy
 
 import java.io.IOException
-import java.nio.file.{Files, Paths, Path}
-import org.apache.commons.cli.{Options, CommandLineParser, DefaultParser, CommandLine}
+import java.nio.file.{Files, Path, Paths}
+
+import org.apache.commons.cli.{CommandLine, CommandLineParser, DefaultParser, Options}
+
 
 object CopyDicomFileTree {
 
@@ -13,25 +15,26 @@ object CopyDicomFileTree {
     val parser: CommandLineParser = new DefaultParser
     val cmd: CommandLine = parser.parse(options, args)
 
+    // Return String value of single CLI option argument
+    def getCommandOptionValue(opt: String): String =
+      if (cmd.hasOption(opt)) cmd.getOptionValue(opt) else ""
+
+    // Return Array[String] values of multiple CLI option arguments
+    def getCommandOptionValues(opt: String): Array[String] =
+      if (cmd.hasOption(opt)) cmd.getOptionValues(opt) else Array()
+
     // Capture command line arguments
-    val dirSourceStr: String =
-      if (cmd.hasOption("s")) cmd.getOptionValue("s") else null
-    val dirTargetStr: String =
-      if (cmd.hasOption("t")) cmd.getOptionValue("t") else null
+    val dirSourceStr: String = getCommandOptionValue("s")
+    val dirTargetStr: String = getCommandOptionValue("t")
+    val dicomSubDirs: String = getCommandOptionValues("d").mkString("|")
+    val dicomBottomDir: String = getCommandOptionValue("b")
+    val dicomSeriesDescrips: String = getCommandOptionValues("q").mkString("|")
 
-    val dicomSubDirs: String =
-       if (cmd.hasOption("d")) cmd.getOptionValues("d").mkString("|") else null
-    val dicomBottomDir: String =
-      if (cmd.hasOption("b")) cmd.getOptionValue("b") else null
-
-    val dicomSeriesDescrips: String =
-       if (cmd.hasOption("q")) cmd.getOptionValues("q").mkString("|") else null
-
-    // Get Path objects from CLI argument Strings
+    // Get Path objects from CLI argument values
     val dirSource: Path = Paths.get(dirSourceStr)
     val dirTarget: Path = Paths.get(dirTargetStr)
 
-    // Create CopyFiles object to pass to walkFileTree method
+    // Create dicomcopy.CopyFiles object to pass to walkFileTree method
     val cf: CopyFiles = new CopyFiles(dirSource, dirTarget, dicomSubDirs, dicomBottomDir, dicomSeriesDescrips)
 
     // Walk file tree with cf object
