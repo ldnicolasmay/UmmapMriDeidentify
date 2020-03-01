@@ -34,6 +34,8 @@ class CopyFiles(
                )
   extends FileVisitor[Path] {
 
+  final private val dicomFileRegex = "^i\\d+\\.MRDC\\.\\d+$"
+
   /**
    * Method that implements DirectoryStream.Filter interface for filtering out DICOM files that do NOT match
    * the provided sequence series description regex
@@ -41,11 +43,13 @@ class CopyFiles(
   final private val filterT1T2 = new DirectoryStream.Filter[Path]() {
 
     override def accept(file: Path): Boolean = {
-      if (file.getFileName.toString.matches(CopyFiles.dicomFileRegex)) {
-        val seriesDescription = CopyFiles.getElementFromPathAndTag(file, TagFromName.SeriesDescription)
-        return seriesDescription.matches(dicomSeriesDescrips)
+      if (file.getFileName.toString.matches(dicomFileRegex)) {
+        val seriesDescription: String =
+          CopyFiles.getAttributeValueFromPathTagNextTag(file,
+            TagFromName.SeriesDescription, TagFromName.ManufacturerModelName)
+        seriesDescription.matches(dicomSeriesDescrips)
       }
-      false
+      else false
     }
   }
 
@@ -69,18 +73,30 @@ class CopyFiles(
     val targetDirIsBottomDicomDir: Boolean = dir.getFileName.toString.matches(dicomBottomDir)
 
     // If at a bottom DICOM directory, check that its DICOM files have series descriptions that match passed regex
+    val filteredStream: DirectoryStream[Path] =
+      try Files.newDirectoryStream(dir, filterT1T2)
+      catch {
+        case e: NotDirectoryException =>
+          System.err.println(s"NotDirectoryException: " +
+            s"preVisitDirectory(${dir.toString}): $e")
+          null
+        case e: IOException =>
+          System.err.println(s"IOException: " +
+            s"preVisitDirectory(${dir.toString}): $e")
+          null
+      }
+
     val targetDirHasRightDicoms: Boolean =
       targetDirIsBottomDicomDir && {
-        try {
-          val filteredStream = Files.newDirectoryStream(dir, filterT1T2)
-          filteredStream.iterator().hasNext
-        } catch {
-          case e: NotDirectoryException =>
-            e.printStackTrace()
+        try filteredStream.iterator().hasNext
+        catch {
+          case e: NullPointerException =>
+            System.err.println(s"NullPointerException: " +
+              s"preVisitDirectory(${dir.toString}): $e")
             false
-          case e: IOException =>
-            e.printStackTrace()
-            false
+        } finally {
+          if (filteredStream != null)
+            filteredStream.close()
         }
       }
 
@@ -121,7 +137,7 @@ class CopyFiles(
 
     val targetFile = target.resolve(source.relativize(file))
 
-    if (targetFile.getFileName.toString.matches(CopyFiles.dicomFileRegex)) {
+    if (targetFile.getFileName.toString.matches(dicomFileRegex)) {
       // 1 - Copy file to targetFile
       // printCopyFile(file, targetFile);
       CopyFiles.copyFile(file, targetFile)
@@ -153,7 +169,7 @@ class CopyFiles(
       // 2c - Write attrList to DicomOutputStream
       val transferSyntaxUID: String = attrList
         .get(TagFromName.TransferSyntaxUID)
-        .getDelimitedStringValuesOrEmptyString  // https://www.dicomlibrary.com/dicom/transfer-syntax/
+        .getDelimitedStringValuesOrEmptyString // https://www.dicomlibrary.com/dicom/transfer-syntax/
       val bfos: BufferedOutputStream = new BufferedOutputStream(new FileOutputStream(targetFile.toString))
 
       // 2d - Write edited AttributeList object (attrList) to BufferedFileOutputStream object (bfos)
@@ -177,7 +193,6 @@ class CopyFiles(
           attrList.clear()
         }
       }
-
     }
 
     CONTINUE
@@ -194,14 +209,13 @@ class CopyFiles(
 
     System.err.println(s"IOException: " +
       s"Unable to copy: visitFileFailed(${file.toString}): $e")
+
     CONTINUE
   }
 }
 
 
 object CopyFiles {
-
-  private val dicomFileRegex = "^i\\d+\\.MRDC\\.\\d+$"
 
   /**
    * Method for copying a source Path object to a destination Path
@@ -219,7 +233,7 @@ object CopyFiles {
       case e: IOException =>
         System.err.println(s"IOException: " +
           s"Unable to copy: copyFile($source, $target): $e")
-        return SKIP_SUBTREE
+        SKIP_SUBTREE
     }
 
     CONTINUE
@@ -245,6 +259,7 @@ object CopyFiles {
         System.err.println(s"IOException: " +
           s"getAttributeListFromPath(${file.toString}): $e")
     }
+
     attrList
   }
 
@@ -254,12 +269,13 @@ object CopyFiles {
    * @param file Path object of DICOM file
    * @return String of DICOM sequence series description
    */
-  private def getElementFromPathAndTag(file: Path, tag: AttributeTag): String = {
+  private def getAttributeValueFromPathTagNextTag(file: Path, tag: AttributeTag, nextTag: AttributeTag): String = {
 
     val attrList = new AttributeList
     val attrTagValue =
       try {
-        attrList.read(file.toString)
+        // attrList.read(file.toString)
+        attrList.read(file.toString, nextTag)
         Attribute.getDelimitedStringValuesOrEmptyString(attrList, tag)
       } catch {
         case e: DicomException =>

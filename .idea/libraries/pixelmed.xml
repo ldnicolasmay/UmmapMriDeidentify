@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="pixelmed">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/pixelmed.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="file://$PROJECT_DIR$/lib/pixelmedjavadicom_javadocrelease.20200227.tar.bz2" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>
