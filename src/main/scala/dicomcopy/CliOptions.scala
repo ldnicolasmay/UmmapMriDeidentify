@@ -3,7 +3,7 @@ package dicomcopy
 import org.apache.commons.cli.{HelpFormatter, Option, Options}
 
 
-object CliOptions {
+private [dicomcopy] object CliOptions {
 
   // Define command line options
   val options: Options = new Options

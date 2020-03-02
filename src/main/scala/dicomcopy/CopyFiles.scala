@@ -25,7 +25,7 @@ import com.pixelmed.dicom.{
  * @param dicomBottomDir      String object of regex for directories that hold DICOM files
  * @param dicomSeriesDescrips String object of regex for which DICOM sequence series descriptions to include
  */
-class CopyFiles(
+private[dicomcopy] class CopyFiles (
                  val source: Path,
                  val target: Path,
                  val dicomSubDirs: String,
@@ -215,7 +215,7 @@ class CopyFiles(
 }
 
 
-object CopyFiles {
+private[dicomcopy] object CopyFiles {
 
   /**
    * Method for copying a source Path object to a destination Path
