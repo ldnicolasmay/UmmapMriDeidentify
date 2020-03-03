@@ -59,19 +59,6 @@ object CopyDicomFileTree {
       case e: IOException => System.err.format("IOException: %s%n", e)
     }
 
-    val dicomFile: Path = Paths.get("/home/hynso/MRI/consensus_downloads_temp/hlp17umm00732_03796/dicom/s00003/i1484278.MRDC.3")
-    val attrList = new AttributeList
-    try attrList.read(dicomFile.toString)
-    catch {
-      case e: DicomException =>
-        System.err.println(s"DicomException: " +
-          s"getAttributeListFromPath(${dicomFile.toString}): $e")
-      case e: IOException =>
-        System.err.println(s"IOException: " +
-          s"getAttributeListFromPath(${dicomFile.toString}): $e")
-    }
-    println(attrList)
-
   }
 
 }

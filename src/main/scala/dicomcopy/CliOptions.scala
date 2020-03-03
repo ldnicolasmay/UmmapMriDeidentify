@@ -3,17 +3,17 @@ package dicomcopy
 import org.apache.commons.cli.{HelpFormatter, Option, Options}
 
 
-private [dicomcopy] object CliOptions {
+private[dicomcopy] object CliOptions {
 
   // Define command line options
   val options: Options = new Options
 
-  // Add help option
-  private val helpOpt: Option = Option.builder("h")
-    .longOpt("help")
-    .desc("print help")
-    .build
-  options.addOption(helpOpt)
+  //  // Add help option
+  //  private val helpOpt: Option = Option.builder("h")
+  //    .longOpt("help")
+  //    .desc("print help")
+  //    .build
+  //  options.addOption(helpOpt)
 
   // Add source directory option
   private val dirSourceOpt: Option = Option.builder("s")
@@ -76,8 +76,8 @@ private [dicomcopy] object CliOptions {
   options.addOption(overwriteOpt)
 
   // private val formatter: HelpFormatter = new HelpFormatter
-  // private val header: String = "Do something useful with an input file\n\n"
-  // private val footer: String = "\nPlease report issues at http://example.com/issues"
+  // private val header: String = "Copy and deidentify DICOM files\n\n"
+  // private val footer: String = "\nPlease report issues to madc-data@umich.edu"
   // formatter.printHelp("java -jar UmmapMriDeidentify.jar", header, options, footer, true)
   // formatter.printHelp("java -jar UmmapMriDeidentify.jar", options)
 

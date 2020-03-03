@@ -162,8 +162,6 @@ private[dicomcopy] class CopyFiles(
 
     val targetFile = target.resolve(source.relativize(file))
 
-    // println(attr.creationTime())
-
     if (targetFile.getFileName.toString.matches(dicomFileRegex) &&
       (copyOptions.contains(REPLACE_EXISTING) || Files.notExists(targetFile))
     ) {
