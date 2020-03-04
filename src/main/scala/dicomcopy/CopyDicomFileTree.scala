@@ -34,19 +34,23 @@ object CopyDicomFileTree {
     val dicomSubDirs: String = getCommandOptionValues("d").mkString("|")
     val dicomBottomDir: String = getCommandOptionValue("b")
     val dicomSeriesDescrips: String = getCommandOptionValues("q").mkString("|")
-    val preserve: Boolean = cmd.hasOption("p")
+//    val preserve: Boolean = cmd.hasOption("p")
     val overwrite: Boolean = cmd.hasOption("o")
 
     // Get Path objects from CLI argument values
     val dirSource: Path = Paths.get(dirSourceStr)
     val dirTarget: Path = Paths.get(dirTargetStr)
 
-    // Translate preserve and overwrite flags to copyOptions passed to CopyFiles object
+//    // Translate preserve and overwrite flags to copyOptions passed to CopyFiles object
+//    val copyOptions: Seq[CopyOption] =
+//      if (preserve && overwrite) Seq(REPLACE_EXISTING, COPY_ATTRIBUTES, NOFOLLOW_LINKS)
+//      else if (preserve && !overwrite) Seq(COPY_ATTRIBUTES, NOFOLLOW_LINKS)
+//      else if (!preserve && overwrite) Seq(REPLACE_EXISTING, NOFOLLOW_LINKS)
+//      else Seq(NOFOLLOW_LINKS)
+
+    // Translate overwrite flag to copyOptions passed to CopyFiles object
     val copyOptions: Seq[CopyOption] =
-      if (preserve && overwrite) Seq(REPLACE_EXISTING, COPY_ATTRIBUTES, NOFOLLOW_LINKS)
-      else if (preserve && !overwrite) Seq(COPY_ATTRIBUTES, NOFOLLOW_LINKS)
-      else if (!preserve && overwrite) Seq(REPLACE_EXISTING, NOFOLLOW_LINKS)
-      else Seq(NOFOLLOW_LINKS)
+      if (overwrite) Seq(REPLACE_EXISTING, NOFOLLOW_LINKS) else Seq(NOFOLLOW_LINKS)
 
     // Create dicomcopy.CopyFiles object to pass to walkFileTree method
     val cf: CopyFiles = new CopyFiles(

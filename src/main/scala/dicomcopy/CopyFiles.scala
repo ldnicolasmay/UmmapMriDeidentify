@@ -102,14 +102,14 @@ private[dicomcopy] class CopyFiles(
       }
 
     val preserve: Boolean = true
-    val dirCopyOptions = if (preserve) Seq(COPY_ATTRIBUTES) else Seq()
+    // val dirCopyOptions = if (preserve) Seq(COPY_ATTRIBUTES) else Seq()
 
     if (targetDirIsIntermedDicomDir ||
       (targetDirIsBottomDicomDir && targetDirHasRightDicoms) &&
         (copyOptions.contains(REPLACE_EXISTING) || Files.notExists(targetDir))) {
-      // printCopyFile(dir, targetDir);
+      // CopyFiles.printCopyFile(dir, targetDir)
       try {
-        Files.copy(dir, targetDir, dirCopyOptions: _*) // ": _*" splat to unpack Seq to Java method varargs
+        Files.copy(dir, targetDir, copyOptions: _*) // ": _*" splat to unpack Seq to Java method varargs
         CONTINUE
       } catch {
         case e: FileAlreadyExistsException => CONTINUE // ignore
@@ -131,18 +131,18 @@ private[dicomcopy] class CopyFiles(
    */
   override def postVisitDirectory(dir: Path, e: IOException): FileVisitResult = {
 
-    val targetDir: Path = target.resolve(source.relativize(dir))
+//    val targetDir: Path = target.resolve(source.relativize(dir))
 
-    if (e == null && copyOptions.contains(COPY_ATTRIBUTES)) {
-      try {
-        Files.setLastModifiedTime(targetDir, Files.getLastModifiedTime(dir, NOFOLLOW_LINKS))
-        Files.setOwner(targetDir, Files.getOwner(dir, NOFOLLOW_LINKS))
-        Files.setPosixFilePermissions(targetDir, Files.getPosixFilePermissions(dir, NOFOLLOW_LINKS))
-      } catch {
-        case e: IOException =>
-          System.err.println(s"Unable to copy all attributes: postVisitDirectory(${dir.toString}): $e")
-      }
-    }
+//    if (e == null && copyOptions.contains(COPY_ATTRIBUTES)) {
+//      try {
+//        Files.setLastModifiedTime(targetDir, Files.getLastModifiedTime(dir, NOFOLLOW_LINKS))
+//        Files.setOwner(targetDir, Files.getOwner(dir, NOFOLLOW_LINKS))
+//        Files.setPosixFilePermissions(targetDir, Files.getPosixFilePermissions(dir, NOFOLLOW_LINKS))
+//      } catch {
+//        case e: IOException =>
+//          System.err.println(s"Unable to copy all attributes: postVisitDirectory(${dir.toString}): $e")
+//      }
+//    }
     if (e != null)
       System.err.println(s"Unable to copy: postVisitDirectory(${dir.toString}, ...): $e")
 
@@ -365,11 +365,11 @@ private[dicomcopy] object CopyFiles {
       //   AttributeList.html#write-java.io.OutputStream-java.lang.String-boolean-boolean-boolean-
       // write(BufferedFileOutputStream, TransferSyntaxUID, useMeta, useBufferedStream, closeAfterWrite)
       attrList.write(bfos, transferSyntaxUID, true, true, true)
-      if (copyOptions.contains(COPY_ATTRIBUTES)) {
-        Files.setLastModifiedTime(targetFile, Files.getLastModifiedTime(file, NOFOLLOW_LINKS))
-        Files.setOwner(targetFile, Files.getOwner(file, NOFOLLOW_LINKS))
-        Files.setPosixFilePermissions(targetFile, Files.getPosixFilePermissions(file, NOFOLLOW_LINKS))
-      }
+//      if (copyOptions.contains(COPY_ATTRIBUTES)) {
+//        Files.setLastModifiedTime(targetFile, Files.getLastModifiedTime(file, NOFOLLOW_LINKS))
+//        Files.setOwner(targetFile, Files.getOwner(file, NOFOLLOW_LINKS))
+//        Files.setPosixFilePermissions(targetFile, Files.getPosixFilePermissions(file, NOFOLLOW_LINKS))
+//      }
     } catch {
       case e: DicomException =>
         System.err.println(s"visitFile(${targetFile.toString}, ...): write(): $e")

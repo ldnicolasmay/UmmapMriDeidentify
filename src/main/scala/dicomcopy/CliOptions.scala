@@ -65,10 +65,10 @@ private[dicomcopy] object CliOptions {
     .build
   options.addOption(dicomSeriesDescripOpt)
 
-  // Add boolean flag for preserving directory/file attributes
-  private val preserveOpt =
-    new Option("p", "preserve", false, "preserve directory/file attributes")
-  options.addOption(preserveOpt)
+//  // Add boolean flag for preserving directory/file attributes
+//  private val preserveOpt =
+//    new Option("p", "preserve", false, "preserve directory/file attributes")
+//  options.addOption(preserveOpt)
 
   // Add boolean flag for overwiting existing directories/files
   private val overwriteOpt =
