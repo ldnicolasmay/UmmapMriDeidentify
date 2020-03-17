@@ -48,9 +48,9 @@ object CopyDicomFileTree {
       else if (!preserve && overwrite) Seq(REPLACE_EXISTING, NOFOLLOW_LINKS)
       else Seq(NOFOLLOW_LINKS)
 
-//    // Translate overwrite flag to copyOptions passed to CopyFiles object
-//    val copyOptions: Seq[CopyOption] =
-//      if (overwrite) Seq(REPLACE_EXISTING, NOFOLLOW_LINKS) else Seq(NOFOLLOW_LINKS)
+    // // Translate overwrite flag to copyOptions passed to CopyFiles object
+    // val copyOptions: Seq[CopyOption] =
+    //   if (overwrite) Seq(REPLACE_EXISTING, NOFOLLOW_LINKS) else Seq(NOFOLLOW_LINKS)
 
     // Create dicomcopy.CopyFiles object to pass to walkFileTree method
     val cf: CopyFiles = new CopyFiles(

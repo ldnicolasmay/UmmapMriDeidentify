@@ -45,7 +45,6 @@ private[dicomcopy] class CopyFiles(
    * the provided sequence series description regex
    */
   final private val filterT1T2 = new DirectoryStream.Filter[Path]() {
-
     override def accept(file: Path): Boolean = {
       if (file.getFileName.toString.matches(dicomFileRegex)) {
         val seriesDescription: String =
@@ -101,8 +100,8 @@ private[dicomcopy] class CopyFiles(
         }
       }
 
-    //    val preserve: Boolean = true
-    //    val dirCopyOptions = if (preserve) Seq(COPY_ATTRIBUTES) else Seq()
+    // val preserve: Boolean = true
+    // val dirCopyOptions = if (preserve) Seq(COPY_ATTRIBUTES) else Seq()
 
     if (targetDirIsIntermedDicomDir ||
       (targetDirIsBottomDicomDir && targetDirHasRightDicoms) &&
