@@ -169,7 +169,7 @@ object FileCopier {
     val idPrefix = """^hlp17umm|^bmh17umm""".r
     val patientIdBefore: String =
       Attribute.getDelimitedStringValuesOrEmptyString(attrList, TagFromName.PatientID)
-    if (patientIdBefore.matches("^hlp17umm\\d{5}$")) {
+    if (patientIdBefore.matches("""^hlp17umm\d{5}$|^bmh17umm\d{5}$""")) {
       val patientIdAfter: String = idPrefix.replaceFirstIn(patientIdBefore, "UM000")
       attrList.replaceWithValueIfPresent(TagFromName.PatientID, patientIdAfter)
     }
