@@ -107,7 +107,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="pixelmed" level="project" />
-    <orderEntry type="library" name="slf4j-nop-1.7.30" level="project" />
   </component>
   <component name="SbtModule">
     <option name="buildForURI" value="file:$MODULE_DIR$/../../" />
