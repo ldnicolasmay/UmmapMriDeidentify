@@ -132,6 +132,7 @@ class ConstructTree extends Callable[Int] {
       println()
     }
 
+    // TODO Create command-line options for controlling overwriting and attribute-copying
     val copyOptions: Seq[CopyOption] =
       Seq(REPLACE_EXISTING, COPY_ATTRIBUTES, NOFOLLOW_LINKS)
     val fileCopier = new FileCopier(sourceDirPath, targetDirPath, copyOptions, verbose)

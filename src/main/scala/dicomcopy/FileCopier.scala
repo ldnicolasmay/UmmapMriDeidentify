@@ -166,7 +166,7 @@ object FileCopier {
   }
 
   private def reformatPatientId(dicomFile: Path, attrList: AttributeList): Unit = {
-    val idPrefix = """^hlp17umm""".r
+    val idPrefix = """^hlp17umm|^bmh17umm""".r
     val patientIdBefore: String =
       Attribute.getDelimitedStringValuesOrEmptyString(attrList, TagFromName.PatientID)
     if (patientIdBefore.matches("^hlp17umm\\d{5}$")) {

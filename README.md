@@ -68,5 +68,5 @@ java -jar /path/to/UmmapMriDeidentify.jar                            \
   --intermed-dirs-regex "^hlp17umm\d{5}_\d{5}$" "^dicom$" "^s\d{5}$" \
   --dicom-file-regex    "^i\d+\.MRDC\.\d+$"                          \
   --seriesdescription   "^t1sag.*$" "^t2flairsag.*$"                 \
-  --verbose > log/$(date "%Y-%m-%d_%H-%M-%S").log
+  --verbose > log/$(date +"%Y-%m-%d_%H-%M-%S").log
 ```
