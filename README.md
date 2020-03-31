@@ -15,9 +15,9 @@ To run the app from a Bash command line, you need to know five pieces of informa
 There are four basic modes for this app:
 
 1. The default mode is to simply upload directories and files that don't already exist, and to not preserve directory/file attributes (viz., last modified timestamp, owner, POSIX permissions).
-~~2. If you pass the `--preserve` (`-p`) flag alone, the non-default behavior of preserving directory/file attributes of all _**new**_ directories/files will be enabled.~~
+2. ~~If you pass the `--preserve` (`-p`) flag alone, the non-default behavior of preserving directory/file attributes of all _**new**_ directories/files will be enabled.~~
 3. If you pass the `--overwrite` (`-o`) flag alone, the non-default behavior of overwriting all directories/files will be enabled. Including the `--overwrite` flag is, of course, a much more time-consuming run of the app.
-~~4. If you pass both the `--preserve` (`-p`) and `--overwrite` (`-o`) flags, the combined non-default behavior of preserving all directory/file attributes _**and**_ overwriting all directories/files will be enabled. As mentioned above, including the `--overwrite` flag is a much more time-consuming run of the app.~~
+4. ~~If you pass both the `--preserve` (`-p`) and `--overwrite` (`-o`) flags, the combined non-default behavior of preserving all directory/file attributes _**and**_ overwriting all directories/files will be enabled. As mentioned above, including the `--overwrite` flag is a much more time-consuming run of the app.~~
 
 
 ### ~~Command Line Help~~ _**Not Implemented Yet**_
