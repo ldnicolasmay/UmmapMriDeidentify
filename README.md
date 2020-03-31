@@ -4,7 +4,7 @@ This app copies and deïdentifies DICOM files from a well defined source directo
 
 A firm grasp of regular expressions is required to use this app effectively. ([RegexOne](https://regexone.com/) offers a good tutorial on regular expressions.)
 
-_**Regex patterns passed as command-line option arguments should be quoted!**_ See [example run](./#example-run) or [example run with logging](./#example-run-with-logging) below.
+_**Regex patterns passed as command-line option arguments should be quoted!**_ See [example run](https://gitlab.com/ldnicolasmay/ummapmrideidentify/-/tree/master#example-run) or [example run with logging](https://gitlab.com/ldnicolasmay/ummapmrideidentify/-/tree/master#example-run-with-logging) below.
 
 ## Using the App
 
