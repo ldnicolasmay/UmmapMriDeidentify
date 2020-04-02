@@ -173,7 +173,7 @@ object FileCopier {
       val patientIdAfter: String = idPrefix.replaceFirstIn(patientIdBefore, "UM000")
       attrList.replaceWithValueIfPresent(TagFromName.PatientID, patientIdAfter)
     }
-    else throw new Exception("PatientID does not match expected format")
+    else throw new Exception(s"PatientID $patientIdBefore does not match expected format")
   }
 
   /**
