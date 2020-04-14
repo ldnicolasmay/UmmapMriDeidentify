@@ -42,9 +42,9 @@ package object dicomcopy {
   }
 
   /**
-   * Predicate to determine whether `dirNode` has any DirNodes or FileNodes
+   * Predicate to determine whether DirNode object has any DirNodes or FileNodes
    *
-   * @param dirNode TODO
+   * @param dirNode DirNode object to evaluate
    * @return Boolean
    */
   def nonemptyDirNodesFilter(dirNode: DirNode): Boolean = {
@@ -52,10 +52,10 @@ package object dicomcopy {
   }
 
   /**
-   * Predicate to determine whether `dirNode` directory name matches
+   * Predicate to determine whether DirNode object directory name matches
    *
-   * @param intermedDirRegex TODO
-   * @param dirNode TODO
+   * @param intermedDirRegex String regex of intermediate directories leading to or containing DICOM files
+   * @param dirNode          DirNode object to evaluate
    * @return Boolean
    */
   def intermedDirNameFilter(intermedDirRegex: String)(dirNode: DirNode): Boolean = {
@@ -64,10 +64,10 @@ package object dicomcopy {
   }
 
   /**
-   * Predicate to determine whether TODO
+   * Predicate to determine whether FileNode object's path file name matches passed regex
    *
-   * @param dicomFileRegex TODO
-   * @param fileNode TODO
+   * @param dicomFileRegex String regex of DICOM file names
+   * @param fileNode       FileNode object to evaluate
    * @return Boolean
    */
   def dicomFileFilter(dicomFileRegex: String)(fileNode: FileNode): Boolean = {
@@ -76,10 +76,10 @@ package object dicomcopy {
   }
 
   /**
-   * Predicate to determine whether TODO
+   * Predicate to determine whether DirNode object contains nor more files than the passed Int
    *
-   * @param maxFileCount TODO
-   * @param dirNode TODO
+   * @param maxFileCount Max number of files
+   * @param dirNode      DirNode object to be evaluated
    * @return Boolean
    */
   def numberOfFilesFilter(maxFileCount: Int)(dirNode: DirNode): Boolean = {
@@ -87,7 +87,7 @@ package object dicomcopy {
   }
 
   /**
-   * TODO Write method description
+   * Predicate to help filter for DICOM files that match file name regex and have matching DICOM Series Descriptions
    *
    * @param dicomFileRegex         Regex String to match against DICOM filenames
    * @param seriesDescriptionRegex Regex String to match against DICOM Series Description element names
@@ -109,9 +109,9 @@ package object dicomcopy {
   }
 
   /**
-   * Determines whether `dirNode` exists in `dirNodeTreeToSearch`
+   * Determines whether DirNode object exists in `dirNodeTreeToSearch`
    *
-   * @param dirNodeTreeToSearch DirNode object tree to search for `dirNode`
+   * @param dirNodeTreeToSearch DirNode object tree to search for DirNode object
    * @param dirNode             DirNode object to find in `dirNodeTreeToSearch`
    * @return Boolean
    */

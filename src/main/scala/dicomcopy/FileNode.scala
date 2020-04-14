@@ -6,18 +6,24 @@ import java.nio.file.{Files, Path}
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 
+/**
+ * Class for file nodes
+ *
+ * @param filePath Path of file
+ * @param depth    Int depth of FileNode object in Node tree containing it
+ */
 case class FileNode(filePath: Path, depth: Int) extends Node {
 
   /**
-   * TODO Write method description
+   * Print hierarchical representation of this FileNode
    */
   override def printNode(): Unit =
     println(s"${"  " * depth}$depth : ${filePath.toString}")
 
   /**
-   * TODO Write method description
+   * Copy this FileNode file using passed FileCopier object; side effects only
    *
-   * @param fileCopier TODO
+   * @param fileCopier FileCopier object with requisite source path, target path, copy options, verbose flag
    */
   override def copyNode(fileCopier: FileCopier): Unit = {
     val attr = Files.readAttributes(filePath, classOf[BasicFileAttributes])
@@ -29,10 +35,12 @@ case class FileNode(filePath: Path, depth: Int) extends Node {
   }
 
   /**
-   * TODO Write method description
+   * Get path index of the directory or file name String passed to method
    *
-   * @param name TODO
-   * @return TODO
+   * For example, FileNode("/foo/bar/baz.txt").getSubpathIndexOf("foo") returns 0
+   *
+   * @param name String name of directory or file to get the path index of
+   * @return Int index of directory or file
    */
   override def getSubpathIndexOf(name: String): Int = {
     val fileNodeFileNameSeq: Seq[String] =
@@ -45,9 +53,11 @@ case class FileNode(filePath: Path, depth: Int) extends Node {
   }
 
   /**
-   * TODO Write method description
+   * Get length of a this FileNode's path iterator, effectively a count of the directories and file in this path
    *
-   * @return TODO
+   * For example, DirNode("/foo/bar/baz.txt").getPathLength returns 3
+   *
+   * @return Int length of this FileNode object's iterator
    */
   override def getPathLength: Int = {
     filePath
@@ -57,14 +67,18 @@ case class FileNode(filePath: Path, depth: Int) extends Node {
   }
 
   /**
-   * TODO Write method description
+   * Substitute a path string for this FileNode object's path string
    *
-   * @param oldName TODO
-   * @param newName TODO
-   * @return TODO
+   * For example,
+   * DirNode("/target/path/file.txt").substituteRootNodeName("/target/path/file.txt", "/source/path/file.txt")
+   * returns DirNode("/source/path/file.txt")
+   *
+   * @param oldName Old path String to substitute
+   * @param newName New path String to use
+   * @return FileNode object with new substitutded path
    */
   override def substituteRootNodeName(oldName: String, newName: String): FileNode = {
-    val nameIndex: Int = this.getSubpathIndexOf(oldName)
+    val nameIndex: Int = getSubpathIndexOf(oldName)
     val newPath =
       filePath
         .getRoot

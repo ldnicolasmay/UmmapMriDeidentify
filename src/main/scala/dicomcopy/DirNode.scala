@@ -8,14 +8,14 @@ import scala.jdk.CollectionConverters.IteratorHasAsScala
 
 
 /**
- * TODO Write class description
+ * Class for recursively constructed directory nodes
  *
- * @param dirPath TODO
- * @param depth TODO
- * @param childDirNodes TODO
- * @param childFileNodes TODO
- * @param intermedDirsRegex TODO
- * @param dicomFileRegex TODO
+ * @param dirPath           Path of directory
+ * @param depth             Int depth of DirNode object in Node tree containing it
+ * @param childDirNodes     List of child DirNode objects
+ * @param childFileNodes    List of child FileNode objects
+ * @param intermedDirsRegex String regex of intermediate directories leading to or containing DICOM files
+ * @param dicomFileRegex    String regex of DICOM file names
  */
 case class DirNode(
                     dirPath: Path,
@@ -28,27 +28,27 @@ case class DirNode(
   extends Node {
 
   /**
-   * TODO Write method description
+   * Return DirNode object in this node tree whose path string matches passed `dirPathString`
    *
-   * @param dirPathString TODO
-   * @return TODO
+   * @param dirPathString String path to match DirNode object in this node tree
+   * @return DirNode object of interest
    */
   def findDirNode(dirPathString: String): Option[DirNode] = {
     childDirNodes.find(_.dirPath.toString == dirPathString)
   }
 
   /**
-   * TODO Write method description
+   * Return FileNode object in this node tree whose path string matches passed `filePathString`
    *
-   * @param filePathString TODO
-   * @return TODO
+   * @param filePathString String path to match FileNode object in this DirNode tree
+   * @return FileNode object of interest
    */
   def findFileNode(filePathString: String): Option[FileNode] = {
     childFileNodes.find(_.filePath.toString == filePathString)
   }
 
   /**
-   * TODO Write method description
+   * Print hierarchical representation of this DirNode tree
    */
   override def printNode(): Unit = {
     println(s"${"  " * depth}$depth ${dirPath.toString}")
@@ -57,9 +57,9 @@ case class DirNode(
   }
 
   /**
-   * TODO Write method description
+   * Recursively count number of child Node objects beneath this DirNode object
    *
-   * @return TODO
+   * @return Int of Node count
    */
   def countSubNodes(): Int = {
     val nodeCountInChildDirs =
@@ -70,10 +70,10 @@ case class DirNode(
   }
 
   /**
-   * TODO Write method description
+   * Recursively filter the child DirNode objects of this DirNode object based on passed predicate
    *
-   * @param predicate TODO
-   * @return TODO
+   * @param predicate Function that accepts a DirNode object and returns a Boolean
+   * @return DirNode object filtered
    */
   def filterChildDirNodesWith(predicate: DirNode => Boolean): DirNode = {
     val filteredChildDirs =
@@ -84,10 +84,10 @@ case class DirNode(
   }
 
   /**
-   * TODO Write method description
+   * Recursively negate-filter the child DirNode objects of this DirNode object based on passed predicate
    *
-   * @param predicate TODO
-   * @return TODO
+   * @param predicate Function that accepts a DirNode object and returns a Boolean
+   * @return DirNode object filtered
    */
   def filterNotChildDirNodesWith(predicate: DirNode => Boolean): DirNode = {
     val filteredChildDirs =
@@ -98,10 +98,10 @@ case class DirNode(
   }
 
   /**
-   * TODO Write method description
+   * Recursively filter the child FileNode objects of this DirNode object based on passed predicate
    *
-   * @param predicate TODO
-   * @return TODO
+   * @param predicate Function that accepts a FileNode object and returns a Boolean
+   * @return DirNode object filtered
    */
   def filterChildFileNodesWith(predicate: FileNode => Boolean): DirNode = {
     val filteredChildFiles = childFileNodes.filter(predicate)
@@ -110,10 +110,10 @@ case class DirNode(
   }
 
   /**
-   * TODO Write method description
+   * Recursively negate-filter the child FileNode objects of this DirNode object based on passed predicate
    *
-   * @param predicate TODO
-   * @return TODO
+   * @param predicate Function that accepts a FileNode object and returns a Boolean
+   * @return DirNode object filtered
    */
   def filterNotChildFileNodesWith(predicate: FileNode => Boolean): DirNode = {
     val filteredChildFiles = childFileNodes.filterNot(predicate)
@@ -122,9 +122,9 @@ case class DirNode(
   }
 
   /**
-   * TODO Write method description
+   * Recursively copy this DirNode tree's directories and files using passed FileCopier object; side effects only
    *
-   * @param fileCopier TODO
+   * @param fileCopier FileCopier object with requisite source path, target path, copy options, verbose flag
    */
   override def copyNode(fileCopier: FileCopier): Unit = {
     val file = dirPath
@@ -141,10 +141,12 @@ case class DirNode(
   }
 
   /**
-   * TODO Write method description
+   * Get path index of the directory or file name String passed to method
    *
-   * @param name TODO
-   * @return TODO
+   * For example, DirNode("/foo/bar").getSubpathIndexOf("foo") returns 0
+   *
+   * @param name String name of directory or file to get the path index of
+   * @return Int index of directory or file
    */
   override def getSubpathIndexOf(name: String): Int = {
     val dirNodeFileNameSeq: Seq[String] =
@@ -157,25 +159,31 @@ case class DirNode(
   }
 
   /**
-   * TODO Write method description
+   * Get length of a this DirNode's path iterator, effectively a count of the directories (and file) in this path
    *
-   * @return TODO
+   * For example, DirNode("/foo/bar/baz.txt").getPathLength returns 3
+   *
+   * @return Int length of this DirNode object's iterator
    */
   override def getPathLength: Int = {
     dirPath.iterator().asScala.length
   }
 
   /**
-   * TODO Write method description
+   * Substitute a path string for this DirNode object's path string
    *
-   * @param oldName TODO
-   * @param newName TODO
-   * @return TODO
+   * For example,
+   * DirNode("/target/path/file.txt").substituteRootNodeName("/target/path/file.txt", "/source/path/file.txt")
+   * returns DirNode("/source/path/file.txt")
+   *
+   * @param oldName Old path String to substitute
+   * @param newName New path String to use
+   * @return DirNode object with new substituted path
    */
   override def substituteRootNodeName(oldName: String, newName: String): DirNode = {
     val nameIndex: Int = getSubpathIndexOf(oldName)
-    val pathLength = getPathLength
-    val newPath =
+    val pathLength: Int = getPathLength
+    val newPath: Path =
       if (pathLength <= nameIndex + 1) {
         dirPath.getRoot.resolve(
           dirPath
@@ -190,9 +198,9 @@ case class DirNode(
             .resolve(dirPath.subpath(nameIndex + 1, pathLength))
         )
       }
-    val newChildFileNodes =
+    val newChildFileNodes: List[FileNode] =
       childFileNodes.map(_.substituteRootNodeName(oldName, newName))
-    val newChildDirNodes =
+    val newChildDirNodes: List[DirNode] =
       childDirNodes.map(_.substituteRootNodeName(oldName, newName))
 
     DirNode(
@@ -207,14 +215,19 @@ case class DirNode(
 
 }
 
+/**
+ * Companion object for DirNode class
+ */
 object DirNode {
 
   /**
-   * TODO Write method description
+   * Apply method to build DirNode object from partial parameters
    *
-   * @param dirPath TODO
-   * @param depth   TODO
-   * @return TODO
+   * @param dirPath           Path of directory
+   * @param depth             Int depth of DirNode object in Node tree containing it
+   * @param intermedDirsRegex String regex of intermediate directories leading to or containing DICOM files
+   * @param dicomFileRegex    String regex of DICOM file names
+   * @return DirNode object
    */
   def apply(dirPath: Path,
             depth: Int,

@@ -74,31 +74,46 @@ class ConstructTree extends Callable[Int] {
   )
   var printFileTrees: Boolean = _
 
+  @Option(
+    names = Array("-p", "--print-performance"),
+    description = Array("Print performance"),
+    paramLabel = "PRINT_PERFORMANCE"
+  )
+  var printPerformance: Boolean = _
+
   @throws(classOf[Exception])
   override def call(): Int = {
 
-    // TODO Comment on actions in this driver object
-
+    // Capture start timestampe
     val startTS: Long = Calendar.getInstance().getTimeInMillis
 
+    // Establish source and target Paths
     val sourceDirPath: Path = Paths.get(sourceDirStr)
     val targetDirPath: Path = Paths.get(targetDirStr)
+    // Capture performance timestamp
     val definepathTS: Long = Calendar.getInstance().getTimeInMillis
 
+    // Collapse CLI option arguments
     val intermedDirsRegex: String =
       sourceDirPath.getFileName.toString + "|" + intermedDirsRegexArray.mkString(sep = "|")
     val dicomFileRegex: String =
       dicomFileRegexArray.mkString(sep = "|")
     val seriesDescriptionRegex: String =
       seriesDescriptionRegexArray.mkString(sep = "|")
+    // Capture performance timestamp
     val defineregexTS: Long = Calendar.getInstance().getTimeInMillis
 
+    // Build source directory node tree
     val sourceDirNode = DirNode(sourceDirPath, 0, intermedDirsRegex, dicomFileRegex)
+    // Capture performance timestamp
     val sourcedirnodeTS: Long = Calendar.getInstance().getTimeInMillis
 
+    // Build target directory node tree
     val targetDirNode = DirNode(targetDirPath, 0, intermedDirsRegex, dicomFileRegex)
+    // Capture performance timestamp
     val targetdirnodeTS: Long = Calendar.getInstance().getTimeInMillis
 
+    // Filter source directory node tree using CLI options and focused filters
     val sourceDirNodeFiltered: DirNode =
       sourceDirNode
         .filterChildDirNodesWith(intermedDirNameFilter(intermedDirsRegex)(_))
@@ -106,22 +121,29 @@ class ConstructTree extends Callable[Int] {
         .filterChildDirNodesWith(numberOfFilesFilter(210)(_))
         .filterChildFileNodesWith(dicomFileT1T2Filter(dicomFileRegex, seriesDescriptionRegex)(_))
         .filterChildDirNodesWith(nonemptyDirNodesFilter(_))
+    // Capture performance timestamp
     val sourcedirnodefilteredTS: Long = Calendar.getInstance().getTimeInMillis
 
+    // Substitute target directory node tree root path with the source directory tree root path,
+    // facilitating identification of source- and target-node tree discrepancies
     val targetDirNodeWithSourceRoot: DirNode =
-      targetDirNode
-        .substituteRootNodeName(
-          targetDirNode.dirPath.getFileName.toString,
-          sourceDirNode.dirPath.getFileName.toString
-        )
+    targetDirNode
+      .substituteRootNodeName(
+        targetDirNode.dirPath.getFileName.toString,
+        sourceDirNode.dirPath.getFileName.toString
+      )
+    // Capture performance timestamp
     val targetdirnodewithsourcerootTS: Long = Calendar.getInstance().getTimeInMillis
 
+    // Filter source node directory tree based on files that already exists in target directory tree node
     val sourceDirNodeFilteredMinusTargetNodeWithSourceRoot =
       sourceDirNodeFiltered
         .filterNotChildFileNodesWith(childFileNodeExistsIn2(targetDirNodeWithSourceRoot)(_))
         .filterChildDirNodesWith(nonemptyDirNodesFilter(_))
+    // Capture performance timestamp
     val sourcedirnodefilteredminustargtenodewithsourcerootTS: Long = Calendar.getInstance().getTimeInMillis
 
+    // Print file trees if CLI flag set
     if (printFileTrees) {
       println("targetDirNodeWithSourceRoot:")
       targetDirNodeWithSourceRoot.printNode()
@@ -135,35 +157,42 @@ class ConstructTree extends Callable[Int] {
     // TODO Create command-line options for controlling overwriting and attribute-copying
     val copyOptions: Seq[CopyOption] =
       Seq(REPLACE_EXISTING, COPY_ATTRIBUTES, NOFOLLOW_LINKS)
+    // Create FileCopier object for copying directories and files
     val fileCopier = new FileCopier(sourceDirPath, targetDirPath, copyOptions, verbose)
 
+    // Copy directories and files in filtered source directory node tree
     sourceDirNodeFilteredMinusTargetNodeWithSourceRoot.copyNode(fileCopier)
+    // Capture performance timestamp
     val copynodeTS: Long = Calendar.getInstance().getTimeInMillis
 
-    println("Performance (time in milliseconds)\n----------------------------------")
-    println(s"Define source and target directory paths:   " +
-      s"${definepathTS - startTS}")
-    println(s"Define regex strings:                       " +
-      s"${defineregexTS - definepathTS}")
-    println(s"Build source directory tree:                " +
-      s"${sourcedirnodeTS - defineregexTS}")
-    println(s"Build target directory tree:                " +
-      s"${targetdirnodeTS - sourcedirnodeTS}")
-    println(s"Filter source directory tree:               " +
-      s"${sourcedirnodefilteredTS - targetdirnodeTS}")
-    println(s"Replace target root with source root:       " +
-      s"${targetdirnodewithsourcerootTS - sourcedirnodefilteredTS}")
-    println(s"Subtract target tree from source tree:      " +
-      s"${sourcedirnodefilteredminustargtenodewithsourcerootTS - targetdirnodewithsourcerootTS}")
-    println(s"Copy only necessary nodes from source tree: " +
-      s"${copynodeTS - sourcedirnodefilteredminustargtenodewithsourcerootTS}")
-    println(s"                                            ------")
-    println(s"Total runtime:                              ${copynodeTS - startTS}")
+    // Print performance times if CLI flag set
+    if (printPerformance) {
+      println("Performance (time in milliseconds)\n----------------------------------")
+      println(s"Define source and target directory paths:   " +
+        s"${definepathTS - startTS}")
+      println(s"Define regex strings:                       " +
+        s"${defineregexTS - definepathTS}")
+      println(s"Build source directory tree:                " +
+        s"${sourcedirnodeTS - defineregexTS}")
+      println(s"Build target directory tree:                " +
+        s"${targetdirnodeTS - sourcedirnodeTS}")
+      println(s"Filter source directory tree:               " +
+        s"${sourcedirnodefilteredTS - targetdirnodeTS}")
+      println(s"Replace target root with source root:       " +
+        s"${targetdirnodewithsourcerootTS - sourcedirnodefilteredTS}")
+      println(s"Subtract target tree from source tree:      " +
+        s"${sourcedirnodefilteredminustargtenodewithsourcerootTS - targetdirnodewithsourcerootTS}")
+      println(s"Copy only necessary nodes from source tree: " +
+        s"${copynodeTS - sourcedirnodefilteredminustargtenodewithsourcerootTS}")
+      println(s"                                            ------")
+      println(s"Total runtime:                              ${copynodeTS - startTS}")
+    }
 
     0
   }
 }
 
+// ConstructTree companion object
 object ConstructTree extends App {
   val exitCode: Int = new CommandLine(new ConstructTree()).execute(args: _*)
   System.exit(exitCode)

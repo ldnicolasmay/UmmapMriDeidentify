@@ -21,7 +21,8 @@ To run the app from a Bash command line, you need to know five pieces of informa
 There are also options for printing output:
 
 1. `--verbose` option (`-v`): Prints source and target paths for each directory and file copied; handy for simple logging.
-2. `--print-file-trees` option (-`t`): Prints trees of the source directory tree and the directory tree to be copied and deïdentified. This should only be used for testing on small, subsetted directory trees.
+2. `--print-file-trees` option (`-t`): Prints trees of the source directory tree and the directory tree to be copied and deïdentified. This should only be used for testing on small, subsetted directory trees.
+3. `--print-performance` option (`-p`): Prints performance of app run.
 
 ### Command Line Help
 
@@ -68,5 +69,7 @@ java -jar /path/to/UmmapMriDeidentify.jar                            \
   --intermed-dirs-regex "^hlp17umm\d{5}_\d{5}$" "^dicom$" "^s\d{5}$" \
   --dicom-file-regex    "^i\d+\.MRDC\.\d+$"                          \
   --seriesdescription   "^t1sag.*$" "^t2flairsag.*$"                 \
-  --verbose > log/$(date +"%Y-%m-%d_%H-%M-%S").log
+  --verbose                                                          \
+  1>log/$(date +"%Y-%m-%d_%H-%M-%S").log                            \
+  2>err/$(date +"%Y-%m-%d_%H-%H-%S").err
 ```

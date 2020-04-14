@@ -12,7 +12,7 @@ import com.pixelmed.dicom.{Attribute, AttributeList, DicomException, TagFromName
 
 
 /**
- * TODO Write class description
+ * Class for defining requisite source path, target path, copy options, verbose flag
  *
  * @param sourceDirPath Path of source directory
  * @param targetDirPath Path of target directory
@@ -28,7 +28,7 @@ class FileCopier(
   extends FileVisitor[Path] {
 
   /**
-   * TODO Write method description
+   * Performs actions before visiting a directory
    *
    * @param dir  Path of directory to act on before visit
    * @param attr BasicFileAttributes of `dir`
@@ -49,7 +49,7 @@ class FileCopier(
   }
 
   /**
-   * TODO Write method description
+   * Performs actions after visiting a directory
    *
    * @param dir Path of directory to act on after visit
    * @param e   IOException thrown from directory visit
@@ -72,7 +72,7 @@ class FileCopier(
   }
 
   /**
-   * TODO Write method description
+   * Performs actions when visiting a Java "File" object (directory or file)
    *
    * @param file File to visit
    * @param attr BasicFileAttributes of `file`
@@ -86,7 +86,7 @@ class FileCopier(
   }
 
   /**
-   * TODO Write method description
+   * Performs actions when visiting a Java "file" object (directory or file) fails
    *
    * @param file File whose visit failed
    * @param e    IOException thrown by failed file visit
@@ -99,10 +99,13 @@ class FileCopier(
 
 }
 
+/**
+ * Companion object for FileCopier class
+ */
 object FileCopier {
 
   /**
-   * TODO Write method description
+   * Copies file from source to target
    *
    * @param source      Path of source file to copy
    * @param target      Path of target where `source` is to be copied
@@ -149,22 +152,28 @@ object FileCopier {
   /**
    * Method to extract DICOM AttributeList from a file Path object
    *
-   * @param file Path object of DICOM file
+   * @param dicomFile Path object of DICOM file
    * @return String of DICOM sequence series description
    */
-  private def getAttributeListFromPath(file: Path): AttributeList = {
+  private def getAttributeListFromPath(dicomFile: Path): AttributeList = {
     val attrList = new AttributeList
     try {
-      attrList.read(file.toString)
+      attrList.read(dicomFile.toString)
     } catch {
       case e: DicomException =>
-        System.err.println(s"getAttributeListFromPath(${file.toString}): $e")
+        System.err.println(s"getAttributeListFromPath(${dicomFile.toString}): $e")
       case e: IOException =>
-        System.err.println(s"getAttributeListFromPath(${file.toString}): $e")
+        System.err.println(s"getAttributeListFromPath(${dicomFile.toString}): $e")
     }
     attrList
   }
 
+  /**
+   * Reformat PatientId elements to UMMAP ID format
+   *
+   * @param dicomFile Path object of DICOM file
+   * @param attrList AttributeList object from DICOM file
+   */
   private def reformatPatientId(dicomFile: Path, attrList: AttributeList): Unit = {
     val idPrefix = """^hlp17umm|^bmh17umm|^hlp14umm|^17umm""".r
     val patientIdBefore: String =
@@ -173,7 +182,7 @@ object FileCopier {
       val patientIdAfter: String = idPrefix.replaceFirstIn(patientIdBefore, "UM000")
       attrList.replaceWithValueIfPresent(TagFromName.PatientID, patientIdAfter)
     }
-    else throw new Exception(s"PatientID $patientIdBefore does not match expected format")
+    else throw new Exception(s"PatientID $patientIdBefore in ${dicomFile.toString} does not match expected format")
   }
 
   /**
