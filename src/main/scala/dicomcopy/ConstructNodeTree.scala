@@ -22,7 +22,7 @@ import picocli.CommandLine.{Command, Option, Parameters}
   parameterListHeading = "%nParameters:%n",
   optionListHeading = "%nOptions:%n"
 )
-class ConstructTree extends Callable[Int] {
+class ConstructNodeTree extends Callable[Int] {
 
   @Parameters(index = "0", description = Array("Source directory"), paramLabel = "SOURCE_DIR")
   var sourceDirStr: String = _
@@ -223,7 +223,7 @@ class ConstructTree extends Callable[Int] {
 }
 
 // ConstructTree companion object
-object ConstructTree extends App {
-  val exitCode: Int = new CommandLine(new ConstructTree()).execute(args: _*)
+object ConstructNodeTree extends App {
+  val exitCode: Int = new CommandLine(new ConstructNodeTree()).execute(args: _*)
   System.exit(exitCode)
 }
