@@ -18,6 +18,10 @@ To run the app from a Bash command line, you need to know five pieces of informa
 4. `--dicom-file-regex` option (`-d`): Regex pattern(s) for the DICOM file name(s).
 5. `--series-description-regex` option (`-s`): Regex pattern(s) for the DICOM Series Description string(s) of DICOM files to be uploaded.
 
+There's an option to zip directories at a user-defined directory tree depth. The zip archive files (`.zip`) will be created at the same level as the directories that are zipped.
+
+1. `--zip-depth` option (`-z`): Integer depth at which to create zip archives (`.zip`) within the target directory tree. For example, `--zip-depth 0` will zip the entire target directory tree ("Target argument" above) into one large zip archive; `--zip-depth 1` will zip each directory 1 level under the target directory.
+
 There are also options for printing output:
 
 1. `--verbose` option (`-v`): Prints source and target paths for each directory and file copied; handy for simple logging.
@@ -34,7 +38,9 @@ java -jar /path/to/UmmapDeidentify.jar --help
 
 ### Canonical Run
 
-Here's an example of a canonical run from a Bash prompt:
+#### Without Zipped Directories
+
+Here's an example of a canonical run from a Bash prompt without any zipping:
 
 ```
 java -jar /path/to/UmmapMriDeidentify.jar                                              \
@@ -45,22 +51,23 @@ java -jar /path/to/UmmapMriDeidentify.jar                                       
   --series-description-regex SERIES_DESCRIPTION_REGEX_1 SERIES_DESCRIPTION_REGEX_2 ...
 ```
 
+#### With Zipped Directories
+
+Here's an example of a canonical run from a Bash prompt with zipping of directories at depth 1 of target directory tree:
+
+```
+java -jar /path/to/UmmapMriDeidentify.jar                                              \
+  SOURCE_DIR                                                                           \
+  TARGET_DIR                                                                           \
+  --intermed-dirs-regex      INTERMED_DIRS_REGEX_1 INTERMED_DIRS_REGEX_2 ...           \
+  --dicom-file-regex         DICOM_FILE_REGEX_1 DICOM_FILE_REGEX_2 ...                 \
+  --series-description-regex SERIES_DESCRIPTION_REGEX_1 SERIES_DESCRIPTION_REGEX_2 ... \
+  --zip-depth                ZIP_DEPTH
+```
+
 ### Example Run
 
-Here's an example run from a Bash prompt:
-
-```
-java -jar /path/to/UmmapMriDeidentify.jar                            \
-  /path/to/source_mri_directory                                      \
-  /path/to/target_mri_directory                                      \
-  --intermed-dirs-regex "^hlp17umm\d{5}_\d{5}$" "^dicom$" "^s\d{5}$" \
-  --dicom-file-regex    "^i\d+\.MRDC\.\d+$"                          \
-  --seriesdescription   "^t1sag.*$" "^t2flairsag.*$"
-```
-
-### Example Run with Logging
-
-For now, logging should be done with Bash redirect operator `>`:
+Here's an example run from a Bash prompt with zipping of directories at depth 1 of target directory tree:
 
 ```
 java -jar /path/to/UmmapMriDeidentify.jar                            \
@@ -69,7 +76,22 @@ java -jar /path/to/UmmapMriDeidentify.jar                            \
   --intermed-dirs-regex "^hlp17umm\d{5}_\d{5}$" "^dicom$" "^s\d{5}$" \
   --dicom-file-regex    "^i\d+\.MRDC\.\d+$"                          \
   --seriesdescription   "^t1sag.*$" "^t2flairsag.*$"                 \
+  --zip-depth           1
+```
+
+### Example Run with Logging
+
+For now, logging can be done with Bash redirect operator `>`:
+
+```
+java -jar /path/to/UmmapMriDeidentify.jar                            \
+  /path/to/source_mri_directory                                      \
+  /path/to/target_mri_directory                                      \
+  --intermed-dirs-regex "^hlp17umm\d{5}_\d{5}$" "^dicom$" "^s\d{5}$" \
+  --dicom-file-regex    "^i\d+\.MRDC\.\d+$"                          \
+  --seriesdescription   "^t1sag.*$" "^t2flairsag.*$"                 \
+  --zip-depth           1                                            \
   --verbose                                                          \
-  1>log/$(date +"%Y-%m-%d_%H-%M-%S").log                            \
+  1>log/$(date +"%Y-%m-%d_%H-%M-%S").log                             \
   2>err/$(date +"%Y-%m-%d_%H-%H-%S").err
 ```

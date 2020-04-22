@@ -61,6 +61,16 @@ class ConstructTree extends Callable[Int] {
   var seriesDescriptionRegexArray: Array[String] = _
 
   @Option(
+    names = Array("-z", "--zip-depth"),
+    arity = "1",
+    description = Array("Depth of folders in file node tree to zip"),
+    paramLabel = "ZIP_DEPTH",
+    required = true,
+    defaultValue = "1"
+  )
+  var zipDepth: String = _
+
+  @Option(
     names = Array("-v", "--verbose"),
     description = Array("Verbose output"),
     paramLabel = "VERBOSE"
@@ -143,16 +153,16 @@ class ConstructTree extends Callable[Int] {
     // Capture performance timestamp
     val sourcedirnodefilteredminustargtenodewithsourcerootTS: Long = Calendar.getInstance().getTimeInMillis
 
-    // Print file trees if CLI flag set
-    if (printFileTrees) {
-      println("targetDirNodeWithSourceRoot:")
-      targetDirNodeWithSourceRoot.printNode()
-      println()
+    val sourceDirNodeFilteredMinusTargetNodeWithSourceRootWithTargetRoot: DirNode =
+      sourceDirNodeFilteredMinusTargetNodeWithSourceRoot
+        .substituteRootNodeName(
+          sourceDirNode.dirPath.getFileName.toString,
+          targetDirNode.dirPath.getFileName.toString
+        )
+    //    // Capture performance timestamp
+    //    val sourcedirnodefilteredminustargetnodewithsourcerootwithtargetrootTS: Long =
+    //      Calendar.getInstance().getTimeInMillis
 
-      println("sourceDirNodeFilteredMinusTargetNodeWithSourceRoot:")
-      sourceDirNodeFilteredMinusTargetNodeWithSourceRoot.printNode()
-      println()
-    }
 
     // TODO Create command-line options for controlling overwriting and attribute-copying
     val copyOptions: Seq[CopyOption] =
@@ -164,6 +174,24 @@ class ConstructTree extends Callable[Int] {
     sourceDirNodeFilteredMinusTargetNodeWithSourceRoot.copyNode(fileCopier)
     // Capture performance timestamp
     val copynodeTS: Long = Calendar.getInstance().getTimeInMillis
+
+    // Zip directories and user-defined file node tree depth
+    sourceDirNodeFilteredMinusTargetNodeWithSourceRootWithTargetRoot.zipNodesAtDepth(zipDepth.toInt, verbose)
+    // Capture performance timestamp
+    val zipnodeTS: Long = Calendar.getInstance().getTimeInMillis
+
+    val endTS: Long = Calendar.getInstance().getTimeInMillis
+
+    // Print file trees if CLI flag set
+    if (printFileTrees) {
+      println("targetDirNodeWithSourceRoot:")
+      targetDirNodeWithSourceRoot.printNode()
+      println()
+
+      println("sourceDirNodeFilteredMinusTargetNodeWithSourceRoot:")
+      sourceDirNodeFilteredMinusTargetNodeWithSourceRoot.printNode()
+      println()
+    }
 
     // Print performance times if CLI flag set
     if (printPerformance) {
@@ -184,8 +212,10 @@ class ConstructTree extends Callable[Int] {
         s"${sourcedirnodefilteredminustargtenodewithsourcerootTS - targetdirnodewithsourcerootTS}")
       println(s"Copy only necessary nodes from source tree: " +
         s"${copynodeTS - sourcedirnodefilteredminustargtenodewithsourcerootTS}")
+      println(s"Zip directories at user-defined depth:      " +
+        s"${zipnodeTS - copynodeTS}")
       println(s"                                            ------")
-      println(s"Total runtime:                              ${copynodeTS - startTS}")
+      println(s"Total runtime:                              ${endTS - startTS}")
     }
 
     0

@@ -2,9 +2,12 @@ package dicomcopy
 
 import java.io.IOException
 import java.nio.file.attribute.BasicFileAttributes
-import java.nio.file.{DirectoryStream, Files, Path}
+import java.nio.file.{DirectoryStream, Files, Path, Paths}
+
 import scala.util.{Failure, Success, Try, Using}
 import scala.jdk.CollectionConverters.IteratorHasAsScala
+
+import org.zeroturnaround.zip.{ZipUtil, NameMapper}
 
 
 /**
@@ -138,6 +141,33 @@ case class DirNode(
     childDirNodes.foreach(_.copyNode(fileCopier))
     childFileNodes.foreach(_.copyNode(fileCopier))
     fileCopier.postVisitDirectory(file, exc)
+  }
+
+  /**
+   * Zip directories at user-defined depth of this DirNode tree
+   *
+   * @param zipDepth Depth in this DirNode tree to zip directories
+   */
+  def zipNodesAtDepth(zipDepth: Int, verbose: Boolean): Unit = {
+    if (this.depth <= zipDepth) {
+      if (this.depth < zipDepth) {
+        // recurse down
+        childDirNodes.foreach(_.zipNodesAtDepth(zipDepth, verbose))
+      }
+      else {
+        // zip this dir
+        if (verbose) println(s"Zipping ${dirPath.toString} @ depth ${depth}")
+        val zipPath: Path = Paths.get(dirPath.toString + ".zip")
+        ZipUtil.pack(
+          dirPath.toFile,
+          zipPath.toFile,
+          new NameMapper() {
+            override def map(name: String): String = dirPath.getFileName.toString + "/" + name
+          }
+        )
+      }
+    }
+    else ()
   }
 
   /**
