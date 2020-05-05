@@ -84,7 +84,7 @@ case class FileNode(filePath: Path, depth: Int) extends Node {
    *
    * @param oldName Old path String to substitute
    * @param newName New path String to use
-   * @return FileNode object with new substitutded path
+   * @return FileNode object with new substituted path
    */
   override def substituteRootNodeName(oldName: String, newName: String): FileNode = {
     val nameIndex: Int = getSubpathIndexOf(oldName)

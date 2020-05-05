@@ -16,7 +16,7 @@ class DirNodeTest extends AnyFunSuite {
   val oneEmptyDirStr: String = "/Users/ldmay/IdeaProjects/UmmapMriDeidentify/dicom/one_empty"
   val oneEmptyPath: Path = Paths.get(oneEmptyDirStr)
 
-  // countSubNode()
+  // countSubNode
   test("MR1 directory should have 3 subnodes") {
     val sourceDirStr: String = origDirStr + "/98890234_20030505_MR/98890234/20030505/MR/MR1"
     val sourceDirPath: Path = Paths.get(sourceDirStr)
@@ -30,6 +30,29 @@ class DirNodeTest extends AnyFunSuite {
     val sourceDirNode: DirNode = DirNode.apply(sourceDirPath, 0, """^MR\d{1,3}$""", """^\d{4,5}$""")
     // assert
     assert(sourceDirNode.countSubNodes() === 7)
+  }
+
+  // getPathLength
+  test("getPathLength on origDirNode should return 6") {
+    val origDirNode: DirNode =
+      DirNode.apply(
+        origDirPath,
+        depth = 0,
+        intermedDirsRegex = """^98890234_20030505_MR$|^98890234$|^20030505$|^MR$|^MR\d{1,3}$""",
+        dicomFileRegex = """^\d{4,5}$""")
+    // assert
+    assert(origDirNode.getPathLength === 6)
+  }
+
+  // getSubpathIndexOf
+  test("getSubpathIndexOf(\"orig\") should return 5") {
+    val origDirNode: DirNode =
+      DirNode.apply(
+        origDirPath,
+        depth = 0,
+        intermedDirsRegex = """^98890234_20030505_MR$|^98890234$|^20030505$|^MR$|^MR\d{1,3}$""",
+        dicomFileRegex = """^\d{4,5}$""")
+    assert(origDirNode.getSubpathIndexOf("orig") === 5)
   }
 
   // substituteRootNodeName
@@ -57,8 +80,7 @@ class DirNodeTest extends AnyFunSuite {
     }
   }
 
-  // filterChildDirNodesWith
-  // -  filterChildDirNodesWith(nonemptyDirNodesFilter)
+  // filterChildDirNodesWith(nonemptyDirNodesFilter)
   test("nonemptyDirNodesFilter should be filter out empty directory") {
     val origDirNode: DirNode =
       DirNode.apply(
@@ -84,7 +106,8 @@ class DirNodeTest extends AnyFunSuite {
           .toString
     }
   }
-  // -  filterChildDirNodesWith(intermediateDirNameFilter)
+
+  // filterChildDirNodesWith(intermediateDirNameFilter)
   test("intermediateDirNameFilter should keep only regexed directories") {
     val origDirNode: DirNode =
       DirNode.apply(
@@ -108,7 +131,7 @@ class DirNodeTest extends AnyFunSuite {
     }
   }
 
-  // - filterChildDirNodesWith(numberOfFilesFilter)
+  // filterChildDirNodesWith(numberOfFilesFilter)
   test("numberOfFilesFilter should keep only branches of tree with <= 7 files") {
     val origDirNode: DirNode =
       DirNode.apply(
@@ -130,5 +153,55 @@ class DirNodeTest extends AnyFunSuite {
           .toString
     }
   }
+
+  // filterChildDirNodesWith(dicomFileFilter)
+  test("dicomFileFilter should only keep branches of tree whose filename matches regex") {
+    val origDirNode: DirNode =
+      DirNode.apply(
+        origDirPath,
+        depth = 0,
+        intermedDirsRegex = """^98890234_20030505_MR$|^98890234$|^20030505$|^MR$|^MR\d{1,3}$""",
+        dicomFileRegex = """^\d{4,5}$""")
+    val origDirNodeFiltered: DirNode =
+      DirNode.apply(
+        origDirPath,
+        depth = 0,
+        intermedDirsRegex = """^98890234_20030505_MR$|^98890234$|^20030505$|^MR$|^MR1$""",
+        dicomFileRegex = """^4919$""")
+    // assert
+    assert {
+      origDirNodeFiltered.toString ==
+        origDirNode
+          .filterChildFileNodesWith(dicomFileFilter("""^4919$"""))
+          .filterChildDirNodesWith(nonemptyDirNodesFilter)
+          .toString
+    }
+  }
+
+  // filterChildFileNodesWith(dicomFileSeriesDescripFilter)
+  test("dicomFileSeriesDescripFilter should only keep branches of tree whose " +
+    "SeriesDescription matches regex") {
+    val origDirNode: DirNode =
+      DirNode.apply(
+        origDirPath,
+        depth = 0,
+        intermedDirsRegex = """^98890234_20030505_MR$|^98890234$|^20030505$|^MR$|^MR\d{1,3}$""",
+        dicomFileRegex = """^\d{4,5}$""")
+    val origDirNodeFiltered: DirNode =
+      DirNode.apply(
+        origDirPath,
+        depth = 0,
+        intermedDirsRegex = """^98890234_20030505_MR$|^98890234$|^20030505$|^MR$|^MR6$""",
+        dicomFileRegex = """^1\d{4}$""")
+    // assert
+    assert {
+      origDirNodeFiltered.toString ==
+        origDirNode
+          .filterChildFileNodesWith(dicomFileSeriesDescripFilter("""^SAG T2 FSE$"""))
+          .filterChildDirNodesWith(nonemptyDirNodesFilter)
+          .toString
+    }
+  }
+
 
 }

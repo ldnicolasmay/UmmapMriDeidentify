@@ -2,16 +2,21 @@
   <dictionary name="ldmay">
     <words>
       <w>Ummap</w>
+      <w>descrip</w>
       <w>descrips</w>
       <w>deïdentified</w>
       <w>deïdentifies</w>
       <w>deïdentify</w>
       <w>dicom</w>
       <w>dicoms</w>
+      <w>flairsag</w>
       <w>intermed</w>
       <w>mrdc</w>
+      <w>regexed</w>
       <w>regexes</w>
+      <w>subnodes</w>
       <w>subpath</w>
+      <w>ummap</w>
     </words>
   </dictionary>
 </component>

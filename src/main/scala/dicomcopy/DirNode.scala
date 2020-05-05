@@ -65,7 +65,9 @@ case class DirNode(
    * @return String of DirNode tree represented hierarchically
    */
   override def toString: String = {
-    s"$depth ${dirPath.toString}\n" + childDirNodes.map(_.toString) + "\n" + childFileNodes.map(_.toString) + "\n"
+    s"$depth ${dirPath.toString}" + "\n" +
+      childDirNodes.map(_.toString) + "\n" +
+      childFileNodes.map(_.toString) + "\n"
   }
 
   /**
@@ -165,7 +167,7 @@ case class DirNode(
       }
       else {
         // zip this dir
-        if (verbose) println(s"Zipping ${dirPath.toString} @ depth ${depth}")
+        if (verbose) println(s"Zipping ${dirPath.toString} @ depth $depth")
         val zipPath: Path = Paths.get(dirPath.toString + ".zip")
         ZipUtil.pack(
           dirPath.toFile,
@@ -198,9 +200,9 @@ case class DirNode(
   }
 
   /**
-   * Get length of a this DirNode's path iterator, effectively a count of the directories (and file) in this path
+   * Get length of a this DirNode's path iterator, effectively a count of the directories in this path
    *
-   * For example, DirNode("/foo/bar/baz.txt").getPathLength returns 3
+   * For example, DirNode("/foo/bar").getPathLength returns 2
    *
    * @return Int length of this DirNode object's iterator
    */

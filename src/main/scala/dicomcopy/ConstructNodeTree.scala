@@ -101,7 +101,7 @@ class ConstructNodeTree extends Callable[Int] {
     val sourceDirPath: Path = Paths.get(sourceDirStr)
     val targetDirPath: Path = Paths.get(targetDirStr)
     // Capture performance timestamp
-    val definepathTS: Long = Calendar.getInstance().getTimeInMillis
+    val definePathTS: Long = Calendar.getInstance().getTimeInMillis
 
     // Collapse CLI option arguments
     val intermedDirsRegex: String =
@@ -111,17 +111,17 @@ class ConstructNodeTree extends Callable[Int] {
     val seriesDescriptionRegex: String =
       seriesDescriptionRegexArray.mkString(sep = "|")
     // Capture performance timestamp
-    val defineregexTS: Long = Calendar.getInstance().getTimeInMillis
+    val defineRegexTS: Long = Calendar.getInstance().getTimeInMillis
 
     // Build source directory node tree
     val sourceDirNode = DirNode(sourceDirPath, 0, intermedDirsRegex, dicomFileRegex)
     // Capture performance timestamp
-    val sourcedirnodeTS: Long = Calendar.getInstance().getTimeInMillis
+    val sourceDirNodeTS: Long = Calendar.getInstance().getTimeInMillis
 
     // Build target directory node tree
     val targetDirNode = DirNode(targetDirPath, 0, intermedDirsRegex, dicomFileRegex)
     // Capture performance timestamp
-    val targetdirnodeTS: Long = Calendar.getInstance().getTimeInMillis
+    val targetDirNodeTS: Long = Calendar.getInstance().getTimeInMillis
 
     // Filter source directory node tree using CLI options and focused filters
     val sourceDirNodeFiltered: DirNode =
@@ -129,10 +129,10 @@ class ConstructNodeTree extends Callable[Int] {
         .filterChildDirNodesWith(intermedDirNameFilter(intermedDirsRegex)(_))
         .filterChildFileNodesWith(dicomFileFilter(dicomFileRegex)(_))
         .filterChildDirNodesWith(numberOfFilesFilter(210)(_))
-        .filterChildFileNodesWith(dicomFileT1T2Filter(dicomFileRegex, seriesDescriptionRegex)(_))
-        .filterChildDirNodesWith(nonemptyDirNodesFilter(_))
+        .filterChildFileNodesWith(dicomFileSeriesDescripFilter(seriesDescriptionRegex)(_))
+        .filterChildDirNodesWith(nonemptyDirNodesFilter)
     // Capture performance timestamp
-    val sourcedirnodefilteredTS: Long = Calendar.getInstance().getTimeInMillis
+    val sourceDirNodeFilteredTS: Long = Calendar.getInstance().getTimeInMillis
 
     // Substitute target directory node tree root path with the source directory tree root path,
     // facilitating identification of source- and target-node tree discrepancies
@@ -143,15 +143,15 @@ class ConstructNodeTree extends Callable[Int] {
         sourceDirNode.dirPath.getFileName.toString
       )
     // Capture performance timestamp
-    val targetdirnodewithsourcerootTS: Long = Calendar.getInstance().getTimeInMillis
+    val targetDirNodeWithSourceRootTS: Long = Calendar.getInstance().getTimeInMillis
 
     // Filter source node directory tree based on files that already exists in target directory tree node
     val sourceDirNodeFilteredMinusTargetNodeWithSourceRoot =
       sourceDirNodeFiltered
-        .filterNotChildFileNodesWith(childFileNodeExistsIn2(targetDirNodeWithSourceRoot)(_))
-        .filterChildDirNodesWith(nonemptyDirNodesFilter(_))
+        .filterNotChildFileNodesWith(childFileNodeExistsIn(targetDirNodeWithSourceRoot)(_))
+        .filterChildDirNodesWith(nonemptyDirNodesFilter)
     // Capture performance timestamp
-    val sourcedirnodefilteredminustargtenodewithsourcerootTS: Long = Calendar.getInstance().getTimeInMillis
+    val sourceDirNodeFilteredMinusTargetNodeWithSourceRootTS: Long = Calendar.getInstance().getTimeInMillis
 
     val sourceDirNodeFilteredMinusTargetNodeWithSourceRootWithTargetRoot: DirNode =
       sourceDirNodeFilteredMinusTargetNodeWithSourceRoot
@@ -159,9 +159,9 @@ class ConstructNodeTree extends Callable[Int] {
           sourceDirNode.dirPath.getFileName.toString,
           targetDirNode.dirPath.getFileName.toString
         )
-    //    // Capture performance timestamp
-    //    val sourcedirnodefilteredminustargetnodewithsourcerootwithtargetrootTS: Long =
-    //      Calendar.getInstance().getTimeInMillis
+    // Capture performance timestamp
+    val sourceDirNodeFilteredMinusTargetNodeWithSourceRootWithTargetRootTS: Long =
+      Calendar.getInstance().getTimeInMillis
 
 
     // TODO Create command-line options for controlling overwriting and attribute-copying
@@ -173,12 +173,12 @@ class ConstructNodeTree extends Callable[Int] {
     // Copy directories and files in filtered source directory node tree
     sourceDirNodeFilteredMinusTargetNodeWithSourceRoot.copyNode(fileCopier)
     // Capture performance timestamp
-    val copynodeTS: Long = Calendar.getInstance().getTimeInMillis
+    val copyNodeTS: Long = Calendar.getInstance().getTimeInMillis
 
     // Zip directories and user-defined file node tree depth
     sourceDirNodeFilteredMinusTargetNodeWithSourceRootWithTargetRoot.zipNodesAtDepth(zipDepth.toInt, verbose)
     // Capture performance timestamp
-    val zipnodeTS: Long = Calendar.getInstance().getTimeInMillis
+    val zipNodeTS: Long = Calendar.getInstance().getTimeInMillis
 
     val endTS: Long = Calendar.getInstance().getTimeInMillis
 
@@ -197,23 +197,28 @@ class ConstructNodeTree extends Callable[Int] {
     if (printPerformance) {
       println("Performance (time in milliseconds)\n----------------------------------")
       println(s"Define source and target directory paths:   " +
-        s"${definepathTS - startTS}")
+        s"${definePathTS - startTS}")
       println(s"Define regex strings:                       " +
-        s"${defineregexTS - definepathTS}")
+        s"${defineRegexTS - definePathTS}")
       println(s"Build source directory tree:                " +
-        s"${sourcedirnodeTS - defineregexTS}")
+        s"${sourceDirNodeTS - defineRegexTS}")
       println(s"Build target directory tree:                " +
-        s"${targetdirnodeTS - sourcedirnodeTS}")
+        s"${targetDirNodeTS - sourceDirNodeTS}")
       println(s"Filter source directory tree:               " +
-        s"${sourcedirnodefilteredTS - targetdirnodeTS}")
+        s"${sourceDirNodeFilteredTS - targetDirNodeTS}")
       println(s"Replace target root with source root:       " +
-        s"${targetdirnodewithsourcerootTS - sourcedirnodefilteredTS}")
+        s"${targetDirNodeWithSourceRootTS - sourceDirNodeFilteredTS}")
       println(s"Subtract target tree from source tree:      " +
-        s"${sourcedirnodefilteredminustargtenodewithsourcerootTS - targetdirnodewithsourcerootTS}")
+        s"${sourceDirNodeFilteredMinusTargetNodeWithSourceRootTS - targetDirNodeWithSourceRootTS}")
+      println(s"Replace source root with target root:       " +
+        s"${
+          sourceDirNodeFilteredMinusTargetNodeWithSourceRootWithTargetRootTS -
+            sourceDirNodeFilteredMinusTargetNodeWithSourceRootTS
+        }")
       println(s"Copy only necessary nodes from source tree: " +
-        s"${copynodeTS - sourcedirnodefilteredminustargtenodewithsourcerootTS}")
+        s"${copyNodeTS - sourceDirNodeFilteredMinusTargetNodeWithSourceRootWithTargetRootTS}")
       println(s"Zip directories at user-defined depth:      " +
-        s"${zipnodeTS - copynodeTS}")
+        s"${zipNodeTS - copyNodeTS}")
       println(s"                                            ------")
       println(s"Total runtime:                              ${endTS - startTS}")
     }

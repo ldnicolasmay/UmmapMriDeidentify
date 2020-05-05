@@ -64,6 +64,17 @@ package object dicomcopy {
   }
 
   /**
+   * Predicate to determine whether DirNode object contains nor more files than the passed Int
+   *
+   * @param maxFileCount Max number of files
+   * @param dirNode      DirNode object to be evaluated
+   * @return Boolean
+   */
+  def numberOfFilesFilter(maxFileCount: Int)(dirNode: DirNode): Boolean = {
+    dirNode.childFileNodes.length <= maxFileCount
+  }
+
+  /**
    * Predicate to determine whether FileNode object's path file name matches passed regex
    *
    * @param dicomFileRegex String regex of DICOM file names
@@ -76,36 +87,22 @@ package object dicomcopy {
   }
 
   /**
-   * Predicate to determine whether DirNode object contains nor more files than the passed Int
-   *
-   * @param maxFileCount Max number of files
-   * @param dirNode      DirNode object to be evaluated
-   * @return Boolean
-   */
-  def numberOfFilesFilter(maxFileCount: Int)(dirNode: DirNode): Boolean = {
-    dirNode.childFileNodes.length <= maxFileCount
-  }
-
-  /**
    * Predicate to help filter for DICOM files that match file name regex and have matching DICOM Series Descriptions
    *
-   * @param dicomFileRegex         Regex String to match against DICOM filenames
    * @param seriesDescriptionRegex Regex String to match against DICOM Series Description element names
    * @param fileNode               FileNode object whose filename must match `dicomFileRegex` and
    *                               to extract target DICOM Series Description element name from
    * @return Boolean
    */
-  def dicomFileT1T2Filter(dicomFileRegex: String, seriesDescriptionRegex: String)
-                         (fileNode: FileNode): Boolean = {
-    if (fileNode.filePath.getFileName.toString.matches(dicomFileRegex)) {
-      val seriesDescription: String =
-        getAttributeValueFromPathTagNextTag(
-          fileNode.filePath,
-          TagFromName.SeriesDescription,
-          TagFromName.ManufacturerModelName
-        )
-      seriesDescription.matches(seriesDescriptionRegex)
-    } else false
+  def dicomFileSeriesDescripFilter(seriesDescriptionRegex: String)
+                                  (fileNode: FileNode): Boolean = {
+    val seriesDescription: String =
+      getAttributeValueFromPathTagNextTag(
+        fileNode.filePath,
+        TagFromName.SeriesDescription,
+        TagFromName.ManufacturerModelName
+      )
+    seriesDescription.matches(seriesDescriptionRegex)
   }
 
   /**
@@ -133,8 +130,8 @@ package object dicomcopy {
    * @return Boolean
    */
   @scala.annotation.tailrec
-  def childFileNodeExistsIn2(dirNodeTreeToSearch: DirNode)
-                            (fileNode: FileNode): Boolean = {
+  def childFileNodeExistsIn(dirNodeTreeToSearch: DirNode)
+                           (fileNode: FileNode): Boolean = {
     if (dirNodeTreeToSearch.childFileNodes.exists(
       _.filePath.toString == fileNode.filePath.toString)) {
       true
@@ -153,7 +150,7 @@ package object dicomcopy {
             s"${dirNodeTreeToSearch.dirPath.toString}/${pathDiffArray.head}")
       targetNode match {
         case Some(newDirNodeTreeToSearch) =>
-          childFileNodeExistsIn2(newDirNodeTreeToSearch)(fileNode)
+          childFileNodeExistsIn(newDirNodeTreeToSearch)(fileNode)
         case None => false
       }
     } else {

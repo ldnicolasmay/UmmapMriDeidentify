@@ -2,10 +2,17 @@
   <library name="pixelmed">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/pixelmed.jar!/" />
+      <root url="file://$PROJECT_DIR$/lib/pixelmedjavadicom_binaryrelease.20200416" />
     </CLASSES>
     <JAVADOC>
-      <root url="file://$PROJECT_DIR$/lib/pixelmedjavadicom_javadocrelease.20200227.tar.bz2" />
+      <root url="file://$PROJECT_DIR$/lib/docs/javadoc" />
     </JAVADOC>
-    <SOURCES />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/lib/pixelmedjavadicom_sourcerelease.20200416" />
+    </SOURCES>
+    <excluded>
+      <root url="file://$PROJECT_DIR$/lib/docs" />
+    </excluded>
+    <jarDirectory url="file://$PROJECT_DIR$/lib/pixelmedjavadicom_binaryrelease.20200416" recursive="false" />
   </library>
 </component>
