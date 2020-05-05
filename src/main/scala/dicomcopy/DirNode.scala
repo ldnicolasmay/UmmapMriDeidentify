@@ -60,6 +60,15 @@ case class DirNode(
   }
 
   /**
+   * String hierarchical representation of this DirNode tree
+   *
+   * @return String of DirNode tree represented hierarchically
+   */
+  override def toString: String = {
+    s"$depth ${dirPath.toString}\n" + childDirNodes.map(_.toString) + "\n" + childFileNodes.map(_.toString) + "\n"
+  }
+
+  /**
    * Recursively count number of child Node objects beneath this DirNode object
    *
    * @return Int of Node count

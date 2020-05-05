@@ -21,6 +21,15 @@ case class FileNode(filePath: Path, depth: Int) extends Node {
     println(s"${"  " * depth}$depth : ${filePath.toString}")
 
   /**
+   * String hierarchical representation of this DirNode tree
+   *
+   * @return String of DirNode tree represented hierarchically
+   */
+  override def toString: String = {
+    s"$depth ${filePath.toString}\n"
+  }
+
+  /**
    * Copy this FileNode file using passed FileCopier object; side effects only
    *
    * @param fileCopier FileCopier object with requisite source path, target path, copy options, verbose flag

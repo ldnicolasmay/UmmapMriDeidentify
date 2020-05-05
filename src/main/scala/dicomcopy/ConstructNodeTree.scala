@@ -94,7 +94,7 @@ class ConstructNodeTree extends Callable[Int] {
   @throws(classOf[Exception])
   override def call(): Int = {
 
-    // Capture start timestampe
+    // Capture start timestamp
     val startTS: Long = Calendar.getInstance().getTimeInMillis
 
     // Establish source and target Paths

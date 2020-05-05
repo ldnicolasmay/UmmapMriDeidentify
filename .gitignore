@@ -1,6 +1,7 @@
 .DS_Store
-archive/*
-lib/*
-out/*
-project/*
-target/*
+archive/
+lib/
+out/
+project/
+target/
+dicom/
