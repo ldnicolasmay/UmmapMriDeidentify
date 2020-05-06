@@ -1,6 +1,8 @@
 <component name="ProjectDictionaryState">
   <dictionary name="ldmay">
     <words>
+      <w>DICOM</w>
+      <w>DICOMs</w>
       <w>Ummap</w>
       <w>descrip</w>
       <w>descrips</w>
@@ -11,6 +13,7 @@
       <w>dicoms</w>
       <w>flairsag</w>
       <w>intermed</w>
+      <w>ldmay</w>
       <w>mrdc</w>
       <w>regexed</w>
       <w>regexes</w>

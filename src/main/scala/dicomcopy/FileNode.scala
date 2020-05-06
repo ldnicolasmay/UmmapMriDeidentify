@@ -25,9 +25,8 @@ case class FileNode(filePath: Path, depth: Int) extends Node {
    *
    * @return String of DirNode tree represented hierarchically
    */
-  override def toString: String = {
+  override def toString: String =
     s"$depth ${filePath.toString}\n"
-  }
 
   /**
    * Copy this FileNode file using passed FileCopier object; side effects only
@@ -36,9 +35,9 @@ case class FileNode(filePath: Path, depth: Int) extends Node {
    */
   override def copyNode(fileCopier: FileCopier): Unit = {
     val attr = Files.readAttributes(filePath, classOf[BasicFileAttributes])
-    try {
+    try
       fileCopier.visitFile(filePath, attr)
-    } catch {
+    catch {
       case e: IOException => fileCopier.visitFileFailed(filePath, e)
     }
   }
@@ -68,12 +67,8 @@ case class FileNode(filePath: Path, depth: Int) extends Node {
    *
    * @return Int length of this FileNode object's iterator
    */
-  override def getPathLength: Int = {
-    filePath
-      .iterator()
-      .asScala
-      .length
-  }
+  override def getPathLength: Int =
+    filePath.iterator().asScala.length
 
   /**
    * Substitute a path string for this FileNode object's path string

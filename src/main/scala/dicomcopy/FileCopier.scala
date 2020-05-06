@@ -39,7 +39,8 @@ class FileCopier(
     try {
       Files.copy(dir, target, copyOptions: _*)
       if (verbose) println(s"Copy: ${dir.toString} => ${target.toString}")
-    } catch {
+    }
+    catch {
       case e: DirectoryNotEmptyException => // ignore
       case e: IOException =>
         System.err.println(s"Unable to copy: preVisitDirectory(${dir.toString}): $e")
@@ -63,7 +64,8 @@ class FileCopier(
         Files.setAttribute(target, "lastModifiedTime", basicAttrs.lastModifiedTime(): FileTime)
         Files.setAttribute(target, "creationTime", basicAttrs.creationTime(): FileTime)
         Files.setAttribute(target, "lastAccessTime", basicAttrs.lastAccessTime(): FileTime)
-      } catch {
+      }
+      catch {
         case e: IOException =>
           System.err.println(s"Unable to copy attributes: postVisitDirectory(${dir.toString}): $e")
       }
@@ -119,7 +121,8 @@ object FileCopier {
     try {
       Files.copy(source, target, copyOptions: _*)
       if (verbose) println(s"Copy: ${source.toString} => ${target.toString}")
-    } catch {
+    }
+    catch {
       case e: FileAlreadyExistsException => // ignore
       case e: IOException =>
         System.err.println(s"Unable to copy: copyFile(${source.toString}): $e")
@@ -157,9 +160,9 @@ object FileCopier {
    */
   private def getAttributeListFromPath(dicomFile: Path): AttributeList = {
     val attrList = new AttributeList
-    try {
+    try
       attrList.read(dicomFile.toString)
-    } catch {
+    catch {
       case e: DicomException =>
         System.err.println(s"getAttributeListFromPath(${dicomFile.toString}): $e")
       case e: IOException =>
@@ -182,7 +185,8 @@ object FileCopier {
       val patientIdAfter: String = idPrefix.replaceFirstIn(patientIdBefore, "UM000")
       attrList.replaceWithValueIfPresent(TagFromName.PatientID, patientIdAfter)
     }
-    else throw new Exception(s"PatientID $patientIdBefore in ${dicomFile.toString} does not match expected format")
+    else
+      throw new Exception(s"PatientID $patientIdBefore in ${dicomFile.toString} does not match expected format")
   }
 
   /**
@@ -250,7 +254,8 @@ object FileCopier {
       attrList.replaceWithZeroLengthIfPresent(TagFromName.RescaleIntercept)
       attrList.replaceWithZeroLengthIfPresent(TagFromName.RescaleSlope)
       attrList.replaceWithZeroLengthIfPresent(TagFromName.RescaleType)
-    } catch {
+    }
+    catch {
       case e: DicomException =>
         System.err.println(s"replacePrivateDicomElements(${dicomFile.toString}, ...): $e")
     }
@@ -263,9 +268,9 @@ object FileCopier {
    * @param attrList  AttributeList object from DICOM file
    */
   private def removePrivateElements(dicomFile: Path, attrList: AttributeList): Unit = {
-    try {
+    try
       attrList.removePrivateAttributes()
-    } catch {
+    catch {
       case e: DicomException =>
         System.err.println(s"removePrivateElements(${dicomFile.toString}, ...): $e")
     }
@@ -298,18 +303,18 @@ object FileCopier {
         Files.setLastModifiedTime(targetDicomFile, Files.getLastModifiedTime(sourceDicomFile, NOFOLLOW_LINKS))
         Files.setPosixFilePermissions(targetDicomFile, Files.getPosixFilePermissions(sourceDicomFile, NOFOLLOW_LINKS))
       }
-    } catch {
+    }
+    catch {
       case e: DicomException =>
         System.err.println(s"writeAttributeListToFile(${targetDicomFile.toString}) DicomExc: $e")
       case e: IOException =>
         System.err.println(s"writeAttributeListToFile(${targetDicomFile.toString}) IOExc: $e")
-    } finally {
-      if (bfos != null) {
+    }
+    finally {
+      if (bfos != null)
         bfos.close()
-      }
-      if (attrList != null) {
+      if (attrList != null)
         attrList.clear()
-      }
     }
   }
 

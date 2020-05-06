@@ -36,9 +36,8 @@ case class DirNode(
    * @param dirPathString String path to match DirNode object in this node tree
    * @return DirNode object of interest
    */
-  def findDirNode(dirPathString: String): Option[DirNode] = {
+  def findDirNode(dirPathString: String): Option[DirNode] =
     childDirNodes.find(_.dirPath.toString == dirPathString)
-  }
 
   /**
    * Return FileNode object in this node tree whose path string matches passed `filePathString`
@@ -46,9 +45,8 @@ case class DirNode(
    * @param filePathString String path to match FileNode object in this DirNode tree
    * @return FileNode object of interest
    */
-  def findFileNode(filePathString: String): Option[FileNode] = {
+  def findFileNode(filePathString: String): Option[FileNode] =
     childFileNodes.find(_.filePath.toString == filePathString)
-  }
 
   /**
    * Print hierarchical representation of this DirNode tree
@@ -206,9 +204,8 @@ case class DirNode(
    *
    * @return Int length of this DirNode object's iterator
    */
-  override def getPathLength: Int = {
+  override def getPathLength: Int =
     dirPath.iterator().asScala.length
-  }
 
   /**
    * Substitute a path string for this DirNode object's path string

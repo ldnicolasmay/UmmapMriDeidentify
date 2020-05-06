@@ -28,14 +28,16 @@ package object dicomcopy {
       try {
         attrList.read(file.toString, nextTag)
         Attribute.getDelimitedStringValuesOrEmptyString(attrList, tag)
-      } catch {
+      }
+      catch {
         case e: DicomException =>
           e.printStackTrace()
           e.toString
         case e: IOException =>
           e.printStackTrace()
           e.toString
-      } finally {
+      }
+      finally {
         attrList.clear()
       }
     attrTagValue
@@ -47,9 +49,8 @@ package object dicomcopy {
    * @param dirNode DirNode object to evaluate
    * @return Boolean
    */
-  def nonemptyDirNodesFilter(dirNode: DirNode): Boolean = {
+  def nonemptyDirNodesFilter(dirNode: DirNode): Boolean =
     dirNode.childDirNodes.nonEmpty || dirNode.childFileNodes.nonEmpty
-  }
 
   /**
    * Predicate to determine whether DirNode object directory name matches
@@ -58,10 +59,8 @@ package object dicomcopy {
    * @param dirNode          DirNode object to evaluate
    * @return Boolean
    */
-  def intermedDirNameFilter(intermedDirRegex: String)(dirNode: DirNode): Boolean = {
-    dirNode.dirPath.getFileName.toString
-      .matches(intermedDirRegex)
-  }
+  def intermedDirNameFilter(intermedDirRegex: String)(dirNode: DirNode): Boolean =
+    dirNode.dirPath.getFileName.toString.matches(intermedDirRegex)
 
   /**
    * Predicate to determine whether DirNode object contains nor more files than the passed Int
@@ -70,9 +69,8 @@ package object dicomcopy {
    * @param dirNode      DirNode object to be evaluated
    * @return Boolean
    */
-  def numberOfFilesFilter(maxFileCount: Int)(dirNode: DirNode): Boolean = {
+  def numberOfFilesFilter(maxFileCount: Int)(dirNode: DirNode): Boolean =
     dirNode.childFileNodes.length <= maxFileCount
-  }
 
   /**
    * Predicate to determine whether FileNode object's path file name matches passed regex
@@ -135,7 +133,8 @@ package object dicomcopy {
     if (dirNodeTreeToSearch.childFileNodes.exists(
       _.filePath.toString == fileNode.filePath.toString)) {
       true
-    } else if (dirNodeTreeToSearch.childDirNodes.nonEmpty) {
+    }
+    else if (dirNodeTreeToSearch.childDirNodes.nonEmpty) {
       val dirNodeTreeToSearchPathString = dirNodeTreeToSearch.dirPath.toString
       val fileNodePathString = fileNode.filePath.toString
       val pathDiffArray: Array[String] =
@@ -153,9 +152,9 @@ package object dicomcopy {
           childFileNodeExistsIn(newDirNodeTreeToSearch)(fileNode)
         case None => false
       }
-    } else {
-      false
     }
+    else
+      false
   }
 
 }
