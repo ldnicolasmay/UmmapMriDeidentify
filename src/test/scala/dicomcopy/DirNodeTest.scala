@@ -16,6 +16,10 @@ class DirNodeTest extends AnyFunSuite {
   val oneEmptyDirStr: String = "/Users/ldmay/IdeaProjects/UmmapMriDeidentify/dicom/one_empty"
   val oneEmptyPath: Path = Paths.get(oneEmptyDirStr)
 
+  /** *****************************
+   * Methods that return primitives
+   */
+
   // countSubNode
   test("MR1 directory should have 3 subnodes") {
     val sourceDirStr: String = origDirStr + "/98890234_20030505_MR/98890234/20030505/MR/MR1"
@@ -55,30 +59,9 @@ class DirNodeTest extends AnyFunSuite {
     assert(origDirNode.getSubpathIndexOf("orig") === 5)
   }
 
-  // substituteRootNodeName
-  test("substituteRootNodeName applied to ./dicom/one_empty should yield ./dicom/orig") {
-    val origDirNode: DirNode =
-      DirNode.apply(
-        origDirPath,
-        depth = 0,
-        intermedDirsRegex = """^98890234_20030505_MR$|^98890234$|^20030505$|^MR$|^MR\d{1,3}$""",
-        dicomFileRegex = """^\d{4,5}$""")
-    val oneEmptyDirNode: DirNode =
-      DirNode.apply(
-        oneEmptyPath,
-        depth = 0,
-        intermedDirsRegex = """^98890234_20030505_MR$|^98890234$|^20030505$|^MR$|^MR\d{1,3}$""",
-        dicomFileRegex = """^\d{4,5}$""")
-    // assert
-    assert {
-      origDirNode ==
-        oneEmptyDirNode
-          .substituteRootNodeName(
-            oneEmptyDirNode.dirPath.getFileName.toString,
-            origDirNode.dirPath.getFileName.toString
-          )
-    }
-  }
+  /** *****************************
+   * Methods that return DirNode
+   */
 
   // filterChildDirNodesWith(nonemptyDirNodesFilter)
   test("nonemptyDirNodesFilter should be filter out empty directory") {
@@ -250,5 +233,94 @@ class DirNodeTest extends AnyFunSuite {
     }
   }
 
+  // substituteRootNodeName
+  test("substituteRootNodeName applied to ./dicom/one_empty should yield ./dicom/orig") {
+    val origDirNode: DirNode =
+      DirNode.apply(
+        origDirPath,
+        depth = 0,
+        intermedDirsRegex = """^98890234_20030505_MR$|^98890234$|^20030505$|^MR$|^MR\d{1,3}$""",
+        dicomFileRegex = """^\d{4,5}$""")
+    val oneEmptyDirNode: DirNode =
+      DirNode.apply(
+        oneEmptyPath,
+        depth = 0,
+        intermedDirsRegex = """^98890234_20030505_MR$|^98890234$|^20030505$|^MR$|^MR\d{1,3}$""",
+        dicomFileRegex = """^\d{4,5}$""")
+    // assert
+    assert {
+      origDirNode ==
+        oneEmptyDirNode
+          .substituteRootNodeName(
+            oneEmptyDirNode.dirPath.getFileName.toString,
+            origDirNode.dirPath.getFileName.toString
+          )
+    }
+  }
+
+  /** *****************************
+   * Methods that return Option[...]
+   */
+
+  // findDirNode
+  test("findDirNode ...") {
+    val mrDirStr: String =
+      "/Users/ldmay/IdeaProjects/UmmapMriDeidentify/dicom/orig/98890234_20030505_MR/98890234/20030505/MR"
+    val mrDirPath: Path = Paths.get(mrDirStr)
+    val mrDirNode: DirNode =
+      DirNode.apply(
+        mrDirPath,
+        depth = 0,
+        intermedDirsRegex = """^MR\d{1,3}$""",
+        dicomFileRegex = """^\d{4,5}$"""
+      )
+    val mr1DirStr: String =
+      "/Users/ldmay/IdeaProjects/UmmapMriDeidentify/dicom/orig/98890234_20030505_MR/98890234/20030505/MR/MR1"
+    val mr1DirPath: Path = Paths.get(mr1DirStr)
+    val mr1DirNode: DirNode =
+      DirNode.apply(
+        mr1DirPath,
+        depth = 1,
+        intermedDirsRegex = "",
+        dicomFileRegex = """^\d{4,5}$"""
+      )
+    val foundDirNode: Any = mrDirNode.findDirNode(mr1DirStr) match {
+      case Some(dn) => dn
+      case None => ()
+    }
+    // assert
+    assert {
+      mr1DirNode.toString == foundDirNode.toString
+    }
+  }
+
+  // findFileNode
+  test("findFileNode ...") {
+    val mr1DirStr: String =
+      "/Users/ldmay/IdeaProjects/UmmapMriDeidentify/dicom/orig/98890234_20030505_MR/98890234/20030505/MR/MR1"
+    val mr1DirPath: Path = Paths.get(mr1DirStr)
+    val mr1DirNode: DirNode =
+      DirNode.apply(
+        mr1DirPath,
+        depth = 0,
+        intermedDirsRegex = "",
+        dicomFileRegex = """^\d{4,5}$"""
+      )
+    val mr1_4919_FileStr: String = mr1DirStr + "/4919"
+    val mr1_4919_FilePath: Path = Paths.get(mr1_4919_FileStr)
+    val mr1_4919_FileNode: FileNode =
+      FileNode.apply(
+        mr1_4919_FilePath,
+        depth = 1
+      )
+    val foundFileNode: Any = mr1DirNode.findFileNode(mr1_4919_FileStr) match {
+      case Some(fn) => fn
+      case None => ()
+    }
+    // assert
+    assert {
+      mr1_4919_FileNode.toString == foundFileNode.toString
+    }
+  }
 
 }

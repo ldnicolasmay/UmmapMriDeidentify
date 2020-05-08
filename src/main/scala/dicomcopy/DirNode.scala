@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters.IteratorHasAsScala
 import org.zeroturnaround.zip.{ZipUtil, NameMapper}
 
 
-/**
+/** *****************************
  * Class for recursively constructed directory nodes
  *
  * @param dirPath           Path of directory
@@ -31,33 +31,6 @@ case class DirNode(
   extends Node {
 
   /**
-   * Return DirNode object in this node tree whose path string matches passed `dirPathString`
-   *
-   * @param dirPathString String path to match DirNode object in this node tree
-   * @return DirNode object of interest
-   */
-  def findDirNode(dirPathString: String): Option[DirNode] =
-    childDirNodes.find(_.dirPath.toString == dirPathString)
-
-  /**
-   * Return FileNode object in this node tree whose path string matches passed `filePathString`
-   *
-   * @param filePathString String path to match FileNode object in this DirNode tree
-   * @return FileNode object of interest
-   */
-  def findFileNode(filePathString: String): Option[FileNode] =
-    childFileNodes.find(_.filePath.toString == filePathString)
-
-  /**
-   * Print hierarchical representation of this DirNode tree
-   */
-  override def printNode(): Unit = {
-    println(s"${"  " * depth}$depth ${dirPath.toString}")
-    childDirNodes.foreach(_.printNode())
-    childFileNodes.foreach(_.printNode())
-  }
-
-  /**
    * String hierarchical representation of this DirNode tree
    *
    * @return String of DirNode tree represented hierarchically
@@ -67,6 +40,10 @@ case class DirNode(
       childDirNodes.map(_.toString) + "\n" +
       childFileNodes.map(_.toString) + "\n"
   }
+
+  /** *****************************
+   * Methods that return primitives
+   */
 
   /**
    * Recursively count number of child Node objects beneath this DirNode object
@@ -80,6 +57,38 @@ case class DirNode(
         .sum
     childDirNodes.length + childFileNodes.length + nodeCountInChildDirs
   }
+
+  /**
+   * Get length of a this DirNode's path iterator, effectively a count of the directories in this path
+   *
+   * For example, DirNode("/foo/bar").getPathLength returns 2
+   *
+   * @return Int length of this DirNode object's iterator
+   */
+  override def getPathLength: Int =
+    dirPath.iterator().asScala.length
+
+  /**
+   * Get path index of the directory or file name String passed to method
+   *
+   * For example, DirNode("/foo/bar").getSubpathIndexOf("foo") returns 0
+   *
+   * @param name String name of directory or file to get the path index of
+   * @return Int index of directory or file
+   */
+  override def getSubpathIndexOf(name: String): Int = {
+    val dirNodeFileNameSeq: Seq[String] =
+      dirPath
+        .iterator()
+        .asScala
+        .map(_.getFileName.toString)
+        .toSeq
+    dirNodeFileNameSeq.indexOf(name)
+  }
+
+  /** *****************************
+   * Methods that return DirNode
+   */
 
   /**
    * Recursively filter the child DirNode objects of this DirNode object based on passed predicate
@@ -134,80 +143,6 @@ case class DirNode(
   }
 
   /**
-   * Recursively copy this DirNode tree's directories and files using passed FileCopier object; side effects only
-   *
-   * @param fileCopier FileCopier object with requisite source path, target path, copy options, verbose flag
-   */
-  override def copyNode(fileCopier: FileCopier): Unit = {
-    val file = dirPath
-    val attr = Files.readAttributes(file, classOf[BasicFileAttributes])
-    var exc: IOException = null
-    try {
-      fileCopier.preVisitDirectory(file, attr)
-    } catch {
-      case e: IOException => exc = e
-    }
-    childDirNodes.foreach(_.copyNode(fileCopier))
-    childFileNodes.foreach(_.copyNode(fileCopier))
-    fileCopier.postVisitDirectory(file, exc)
-  }
-
-  /**
-   * Zip directories at user-defined depth of this DirNode tree
-   *
-   * @param zipDepth Depth in this DirNode tree to zip directories
-   */
-  def zipNodesAtDepth(zipDepth: Int, verbose: Boolean): Unit = {
-    if (this.depth <= zipDepth) {
-      if (this.depth < zipDepth) {
-        // recurse down
-        childDirNodes.foreach(_.zipNodesAtDepth(zipDepth, verbose))
-      }
-      else {
-        // zip this dir
-        if (verbose) println(s"Zipping ${dirPath.toString} @ depth $depth")
-        val zipPath: Path = Paths.get(dirPath.toString + ".zip")
-        ZipUtil.pack(
-          dirPath.toFile,
-          zipPath.toFile,
-          new NameMapper() {
-            override def map(name: String): String = dirPath.getFileName.toString + "/" + name
-          }
-        )
-      }
-    }
-    else ()
-  }
-
-  /**
-   * Get path index of the directory or file name String passed to method
-   *
-   * For example, DirNode("/foo/bar").getSubpathIndexOf("foo") returns 0
-   *
-   * @param name String name of directory or file to get the path index of
-   * @return Int index of directory or file
-   */
-  override def getSubpathIndexOf(name: String): Int = {
-    val dirNodeFileNameSeq: Seq[String] =
-      dirPath
-        .iterator()
-        .asScala
-        .map(_.getFileName.toString)
-        .toSeq
-    dirNodeFileNameSeq.indexOf(name)
-  }
-
-  /**
-   * Get length of a this DirNode's path iterator, effectively a count of the directories in this path
-   *
-   * For example, DirNode("/foo/bar").getPathLength returns 2
-   *
-   * @return Int length of this DirNode object's iterator
-   */
-  override def getPathLength: Int =
-    dirPath.iterator().asScala.length
-
-  /**
    * Substitute a path string for this DirNode object's path string
    *
    * For example,
@@ -251,9 +186,91 @@ case class DirNode(
     )
   }
 
+  /** *****************************
+   * Methods that return Option[...]
+   */
+
+  /**
+   * Return child DirNode of this DirNode whose path string matches passed `dirPathString`
+   *
+   * @param dirPathString String path to match DirNode object in this node tree
+   * @return DirNode object of interest
+   */
+  def findDirNode(dirPathString: String): Option[DirNode] =
+    childDirNodes.find(_.dirPath.toString == dirPathString)
+
+  /**
+   * Return child FileNode of this DirNode whose path string matches passed `filePathString`
+   *
+   * @param filePathString String path to match FileNode object in this DirNode tree
+   * @return FileNode object of interest
+   */
+  def findFileNode(filePathString: String): Option[FileNode] =
+    childFileNodes.find(_.filePath.toString == filePathString)
+
+  /** *****************************
+   * Methods that return Unit
+   */
+
+  /**
+   * Print hierarchical representation of this DirNode tree
+   */
+  override def printNode(): Unit = {
+    println(s"${"  " * depth}$depth ${dirPath.toString}")
+    childDirNodes.foreach(_.printNode())
+    childFileNodes.foreach(_.printNode())
+  }
+
+  /**
+   * Recursively copy this DirNode tree's directories and files using passed FileCopier object; side effects only
+   *
+   * @param fileCopier FileCopier object with requisite source path, target path, copy options, verbose flag
+   */
+  override def copyNode(fileCopier: FileCopier): Unit = {
+    val file = dirPath
+    val attr = Files.readAttributes(file, classOf[BasicFileAttributes])
+    var exc: IOException = null
+    try {
+      fileCopier.preVisitDirectory(file, attr)
+    } catch {
+      case e: IOException => exc = e
+    }
+    childDirNodes.foreach(_.copyNode(fileCopier))
+    childFileNodes.foreach(_.copyNode(fileCopier))
+    fileCopier.postVisitDirectory(file, exc)
+  }
+
+  /**
+   * Zip directories at user-defined depth of this DirNode tree
+   *
+   * @param zipDepth Depth in this DirNode tree to zip directories
+   * @param verbose  Boolean flag for verbose printing
+   */
+  def zipNodesAtDepth(zipDepth: Int, verbose: Boolean): Unit = {
+    if (this.depth <= zipDepth) {
+      if (this.depth < zipDepth) {
+        // recurse down
+        childDirNodes.foreach(_.zipNodesAtDepth(zipDepth, verbose))
+      }
+      else {
+        // zip this dir
+        if (verbose) println(s"Zipping ${dirPath.toString} @ depth $depth")
+        val zipPath: Path = Paths.get(dirPath.toString + ".zip")
+        ZipUtil.pack(
+          dirPath.toFile,
+          zipPath.toFile,
+          new NameMapper() {
+            override def map(name: String): String = dirPath.getFileName.toString + "/" + name
+          }
+        )
+      }
+    }
+    else ()
+  }
+
 }
 
-/**
+/** *****************************
  * Companion object for DirNode class
  */
 object DirNode {
