@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters.IteratorHasAsScala
 import org.zeroturnaround.zip.{ZipUtil, NameMapper}
 
 
-/** *****************************
+/**
  * Class for recursively constructed directory nodes
  *
  * @param dirPath           Path of directory
@@ -41,7 +41,7 @@ case class DirNode(
       childFileNodes.map(_.toString) + "\n"
   }
 
-  /** *****************************
+  /**
    * Methods that return primitives
    */
 
@@ -86,7 +86,7 @@ case class DirNode(
     dirNodeFileNameSeq.indexOf(name)
   }
 
-  /** *****************************
+  /**
    * Methods that return DirNode
    */
 
@@ -186,7 +186,7 @@ case class DirNode(
     )
   }
 
-  /** *****************************
+  /**
    * Methods that return Option[...]
    */
 
@@ -208,7 +208,7 @@ case class DirNode(
   def findFileNode(filePathString: String): Option[FileNode] =
     childFileNodes.find(_.filePath.toString == filePathString)
 
-  /** *****************************
+  /**
    * Methods that return Unit
    */
 
@@ -270,7 +270,7 @@ case class DirNode(
 
 }
 
-/** *****************************
+/**
  * Companion object for DirNode class
  */
 object DirNode {

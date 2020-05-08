@@ -27,7 +27,6 @@ abstract class Node {
    * Get length of a Node's path iterator, effectively a count of the directories (and file) in this path
    *
    * @return Int length of Node object's iterator
-   * @return Int length of Node object's iterator
    */
   def getPathLength: Int
 
